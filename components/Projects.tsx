@@ -11,7 +11,7 @@ const projects = [
     description:
       "A Strava-connected running analytics app. Visualizes your training data with insights and trends to help you run smarter.",
     tags: ["Python", "Flask", "Strava API", "Render"],
-    href: "#",
+    href: "/runiq",
     status: "Live",
   },
   {
