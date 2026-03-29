@@ -29,26 +29,18 @@ export default function Booking() {
   const [session, setSession] = useState(sessionTypes[0]);
   const [date, setDate] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, session, date, message }),
-      });
-      if (!res.ok) throw new Error();
-      setStatus("success");
-      setName("");
-      setEmail("");
-      setDate("");
-      setMessage("");
-    } catch {
-      setStatus("error");
-    }
+    const subject = `Photography Booking — ${session}`;
+    const body = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Session type: ${session}`,
+      `Preferred date: ${date || "Flexible"}`,
+      `\nMessage:\n${message}`,
+    ].join("\n");
+    window.location.href = `mailto:mail@kabirj.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
@@ -198,30 +190,12 @@ export default function Booking() {
               />
             </div>
 
-            {status === "success" ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="py-4 text-center text-sm text-white/60 font-mono tracking-wide border border-white/10 rounded-xl"
-              >
-                Message sent — I&apos;ll be in touch within 24 hours.
-              </motion.div>
-            ) : (
-              <>
-                {status === "error" && (
-                  <p className="text-xs text-red-400/70 font-mono text-center">
-                    Something went wrong. Try emailing mail@kabirj.com directly.
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === "loading" ? "Sending..." : "Send inquiry"}
-                </button>
-              </>
-            )}
+            <button
+              type="submit"
+              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200"
+            >
+              Send inquiry
+            </button>
           </motion.form>
         </div>
       </div>
