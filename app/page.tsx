@@ -1,19 +1,30 @@
+import Cursor from "@/components/Cursor";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Gallery from "@/components/Gallery";
+import HorizontalGallery from "@/components/HorizontalGallery";
 import About from "@/components/About";
+import PhotoBreak from "@/components/PhotoBreak";
 import Services from "@/components/Services";
 import Booking from "@/components/Booking";
 
 export default function Home() {
   return (
-    <main className="bg-[#080808] min-h-screen">
-      <Navbar />
-      <Hero />
-      <Gallery />
-      <About />
-      <Services />
-      <Booking />
-    </main>
+    <>
+      <Cursor />
+      <main className="bg-black">
+        <Navbar />
+        <Hero />
+        <HorizontalGallery />
+        <About />
+        <PhotoBreak
+          src="/photos/20251010-DSC02484.jpg"
+          alt="Athlete celebrates with teammates after race"
+          caption="The moment after."
+          subcaption="©kabirjphoto"
+        />
+        <Services />
+        <Booking />
+      </main>
+    </>
   );
 }

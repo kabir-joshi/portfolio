@@ -16,6 +16,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Hide default cursor on pointer devices — custom cursor handles it */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
