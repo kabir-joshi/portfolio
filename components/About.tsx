@@ -1,111 +1,100 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import type { Variants } from "framer-motion";
 import { useRef } from "react";
 import { EASE } from "@/lib/easing";
 
-const skills = [
-  "TypeScript",
-  "Python",
-  "Swift",
-  "React",
-  "Next.js",
-  "Flask",
-  "SpriteKit",
-  "SwiftUI",
-  "Tailwind CSS",
-  "Git",
+const stats = [
+  { value: "—", label: "shoots completed" },
+  { value: "—", label: "years shooting" },
+  { value: "—", label: "cities covered" },
 ];
 
 export default function About() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
-  const containerVariants: Variants = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.08 },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.4, ease: "easeOut" },
-    },
-  };
-
   return (
     <section id="about" className="py-32 px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Section label */}
         <motion.div
+          ref={ref}
           initial={{ opacity: 0, x: -20 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
-          ref={ref}
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-16"
         >
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
-            01 / About
+            02 / About
           </span>
           <div className="h-px flex-1 bg-white/5" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Text */}
+          {/* Photo placeholder */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8 leading-tight">
-              I build things
-              <br />
-              <span className="text-white/30">for the web & beyond.</span>
-            </h2>
-            <div className="space-y-5 text-white/50 leading-relaxed">
-              <p>
-                I&apos;m a developer with a passion for crafting clean,
-                performant experiences. Whether it&apos;s a web app, a game, or
-                a data tool — I care about the details.
-              </p>
-              <p>
-                When I&apos;m not writing code, I&apos;m probably thinking about
-                design, running, or finding the next problem worth solving.
-              </p>
+            <div
+              className="aspect-[3/4] rounded-2xl relative overflow-hidden flex items-center justify-center"
+              style={{ background: "linear-gradient(160deg, #141414 0%, #0a0a0a 100%)" }}
+            >
+              <div className="absolute inset-4 border border-white/[0.04] rounded-xl" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                className="text-white/10"
+              >
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
             </div>
           </motion.div>
 
-          {/* Skills */}
+          {/* Text */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
+            className="flex flex-col justify-center"
           >
-            <p className="text-xs font-mono text-white/25 tracking-[0.2em] uppercase mb-6">
-              Technologies
-            </p>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate={inView ? "visible" : "hidden"}
-              className="flex flex-wrap gap-2"
-            >
-              {skills.map((skill) => (
-                <motion.span
-                  key={skill}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.05, borderColor: "rgba(167,139,250,0.4)" }}
-                  className="px-4 py-2 rounded-full text-sm text-white/60 border border-white/8 bg-white/2 cursor-default transition-colors duration-200 hover:text-white/90"
-                >
-                  {skill}
-                </motion.span>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8 leading-tight">
+              I shoot what
+              <br />
+              <span className="text-white/30">moves me.</span>
+            </h2>
+            <div className="space-y-5 text-white/50 leading-relaxed mb-12">
+              <p>
+                Based in [Location], I&apos;m drawn to the authentic — the quiet
+                moments between moments, the light that only lasts a second, the
+                expressions that tell a story without words.
+              </p>
+              <p>
+                Whether it&apos;s a portrait session, live event, or something
+                entirely custom, I bring the same attention to detail and
+                intentionality to every shoot.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/5">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="text-2xl font-bold text-white mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs text-white/30 font-mono leading-snug">
+                    {stat.label}
+                  </div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>

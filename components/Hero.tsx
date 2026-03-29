@@ -93,13 +93,13 @@ export default function Hero() {
       >
         <motion.div variants={itemVariants}>
           <span className="inline-block text-xs font-mono text-white/30 tracking-[0.3em] uppercase mb-8 px-4 py-2 rounded-full border border-white/5 bg-white/2">
-            available for work
+            available for bookings
           </span>
         </motion.div>
 
         <motion.h1
           variants={itemVariants}
-          className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-none mb-6"
+          className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-none mb-4"
         >
           <span className="text-white">Kabir</span>
           <br />
@@ -116,9 +116,16 @@ export default function Hero() {
 
         <motion.p
           variants={itemVariants}
+          className="text-xs font-mono text-white/20 tracking-[0.5em] uppercase mb-8"
+        >
+          Photography
+        </motion.p>
+
+        <motion.p
+          variants={itemVariants}
           className="text-lg md:text-xl text-white/40 max-w-lg mx-auto leading-relaxed mb-12"
         >
-          Builder & developer. I create things that live on the internet.
+          Capturing moments. Creating stories.
         </motion.p>
 
         <motion.div
@@ -126,17 +133,17 @@ export default function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
-            href="#projects"
+            href="#gallery"
             className="group relative px-8 py-4 rounded-full bg-white text-black text-sm font-medium overflow-hidden transition-all duration-300 hover:scale-105"
           >
-            <span className="relative z-10">View my work</span>
+            <span className="relative z-10">View gallery</span>
             <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </a>
           <a
-            href="#contact"
+            href="#booking"
             className="px-8 py-4 rounded-full border border-white/10 text-white/70 text-sm font-medium hover:border-white/30 hover:text-white transition-all duration-300 hover:scale-105"
           >
-            Say hello
+            Book a session
           </a>
         </motion.div>
 

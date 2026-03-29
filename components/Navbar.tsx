@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EASE } from "@/lib/easing";
 
 const links = [
+  { label: "Gallery", href: "#gallery" },
   { label: "About", href: "#about" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "Services", href: "#services" },
 ];
 
 export default function Navbar() {
@@ -51,10 +51,10 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href="#contact"
+            href="#booking"
             className="text-sm px-4 py-2 rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all duration-200"
           >
-            Get in touch
+            Book a session
           </a>
         </nav>
 
@@ -103,6 +103,13 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <a
+                href="#booking"
+                onClick={() => setMenuOpen(false)}
+                className="text-white/60 hover:text-white transition-colors text-lg"
+              >
+                Book a session
+              </a>
             </nav>
           </motion.div>
         )}

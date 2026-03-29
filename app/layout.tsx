@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kabir Joshi",
-  description: "Portfolio of Kabir Joshi — builder, developer, creator.",
+  title: "Kabir Joshi — Photography",
+  description: "Photography portfolio and bookings — Kabir Joshi.",
 };
 
 export default function RootLayout({
