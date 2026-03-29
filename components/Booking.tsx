@@ -12,7 +12,7 @@ const sessionTypes = [
 ];
 
 const socials = [
-  { label: "Instagram", href: "#" },
+  { label: "Instagram", href: "https://www.instagram.com/kabirjphoto/" },
   { label: "Email", href: "mailto:mail@kabirj.com" },
   { label: "GitHub", href: "https://github.com/kabir-joshi" },
 ];
