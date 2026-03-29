@@ -5,9 +5,9 @@ import { useRef } from "react";
 import { EASE } from "@/lib/easing";
 
 const stats = [
-  { value: "—", label: "shoots completed" },
+  { value: "—", label: "shoots covered" },
   { value: "—", label: "years shooting" },
-  { value: "—", label: "cities covered" },
+  { value: "—", label: "events documented" },
 ];
 
 export default function About() {
@@ -27,7 +27,7 @@ export default function About() {
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
             02 / About
           </span>
-          <div className="h-px flex-1 bg-white/5" />
+          <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
@@ -38,13 +38,12 @@ export default function About() {
             transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
           >
             <div
-              className="aspect-[3/4] rounded-2xl relative overflow-hidden flex items-center justify-center"
-              style={{ background: "linear-gradient(160deg, #141414 0%, #0a0a0a 100%)" }}
+              className="aspect-[3/4] rounded-2xl relative overflow-hidden flex items-center justify-center border border-white/[0.06]"
+              style={{ background: "#0a0a0a" }}
             >
-              <div className="absolute inset-4 border border-white/[0.04] rounded-xl" />
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -67,29 +66,29 @@ export default function About() {
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8 leading-tight">
               I shoot what
               <br />
-              <span className="text-white/30">moves me.</span>
+              <span className="text-[#86868b]">moves me.</span>
             </h2>
-            <div className="space-y-5 text-white/50 leading-relaxed mb-12">
+            <div className="space-y-5 text-[#86868b] leading-relaxed mb-12">
               <p>
-                Based in [Location], I&apos;m drawn to the authentic — the quiet
-                moments between moments, the light that only lasts a second, the
-                expressions that tell a story without words.
+                I specialize in track & field, cross country, and road racing —
+                the grit, the glory, the split-second moments that define
+                competition.
               </p>
               <p>
-                Whether it&apos;s a portrait session, live event, or something
-                entirely custom, I bring the same attention to detail and
-                intentionality to every shoot.
+                Whether it&apos;s a state championship or a local 5K, I bring
+                the same attention to light, timing, and story to every event I
+                cover.
               </p>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/5">
+            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/[0.06]">
               {stats.map((stat) => (
                 <div key={stat.label}>
                   <div className="text-2xl font-bold text-white mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-xs text-white/30 font-mono leading-snug">
+                  <div className="text-xs text-[#86868b] font-mono leading-snug">
                     {stat.label}
                   </div>
                 </div>

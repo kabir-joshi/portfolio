@@ -7,25 +7,25 @@ import { EASE } from "@/lib/easing";
 const services = [
   {
     number: "01",
-    title: "Portrait Session",
+    title: "Event Coverage",
     description:
-      "Individual, couple, or family portraits. Studio or on location. Focused on capturing genuine emotion and connection.",
-    details: ["1–2 hours", "Outdoor or studio", "Edited gallery delivered"],
+      "Track & field meets, cross country races, road races. Half-day or full-day. Every key moment documented.",
+    details: ["Half or full day", "Multiple events/locations", "Turnaround within 2 weeks"],
     cta: "Book a session",
   },
   {
     number: "02",
-    title: "Event Coverage",
+    title: "Portrait Session",
     description:
-      "Half-day or full-day coverage. Weddings, graduations, brand activations — every moment documented.",
-    details: ["Half or full day", "Multiple locations", "Turnaround within 2 weeks"],
+      "Individual or team athlete portraits. Studio or on location. Built around your story.",
+    details: ["1–2 hours", "Outdoor or studio", "Edited gallery delivered"],
     cta: "Book a session",
   },
   {
     number: "03",
     title: "Commercial & Custom",
     description:
-      "Brand shoots, editorial, product, and custom projects. Let's build something together from the ground up.",
+      "Brand shoots, editorial, and custom projects. Let's build something together from the ground up.",
     details: ["Custom scope", "Usage licensing available", "Creative collaboration"],
     cta: "Get in touch",
   },
@@ -48,7 +48,7 @@ export default function Services() {
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
             03 / Services
           </span>
-          <div className="h-px flex-1 bg-white/5" />
+          <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
         <motion.h2
@@ -68,24 +68,15 @@ export default function Services() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
               whileHover={{ y: -4 }}
-              className="group relative p-8 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300 overflow-hidden cursor-default"
+              className="group relative p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default"
             >
-              {/* Hover glow */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
-                style={{
-                  background:
-                    "radial-gradient(300px circle at 50% 0%, rgba(167,139,250,0.06), transparent 60%)",
-                }}
-              />
-
-              <span className="text-xs font-mono text-white/15 mb-6 block">
+              <span className="text-xs font-mono text-white/20 mb-6 block">
                 {service.number}
               </span>
               <h3 className="text-2xl font-bold text-white mb-3">
                 {service.title}
               </h3>
-              <p className="text-white/40 text-sm leading-relaxed mb-6">
+              <p className="text-[#86868b] text-sm leading-relaxed mb-6">
                 {service.description}
               </p>
 
@@ -93,9 +84,9 @@ export default function Services() {
                 {service.details.map((detail) => (
                   <li
                     key={detail}
-                    className="flex items-center gap-2 text-xs text-white/25 font-mono"
+                    className="flex items-center gap-2 text-xs text-white/30 font-mono"
                   >
-                    <span className="w-px h-3 bg-violet-500/40 shrink-0" />
+                    <span className="w-px h-3 bg-white/20 shrink-0" />
                     {detail}
                   </li>
                 ))}

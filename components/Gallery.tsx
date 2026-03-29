@@ -2,23 +2,50 @@
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { EASE } from "@/lib/easing";
 
-const categories = ["All", "Portraits", "Events", "Street"];
+const categories = ["All", "Track & Field", "Cross Country", "Road Racing"];
 
 const photos = [
-  { id: 1, category: "Portraits", aspect: "aspect-[3/4]" },
-  { id: 2, category: "Events", aspect: "aspect-[4/3]" },
-  { id: 3, category: "Street", aspect: "aspect-[3/4]" },
-  { id: 4, category: "Portraits", aspect: "aspect-square" },
-  { id: 5, category: "Events", aspect: "aspect-[3/4]" },
-  { id: 6, category: "Street", aspect: "aspect-[4/3]" },
-  { id: 7, category: "Portraits", aspect: "aspect-[4/3]" },
-  { id: 8, category: "Events", aspect: "aspect-square" },
-  { id: 9, category: "Street", aspect: "aspect-[3/4]" },
+  {
+    id: 1,
+    category: "Road Racing",
+    aspect: "aspect-[4/5]",
+    src: "/photos/marathon-runner.jpg",
+    alt: "Marathon runner in race",
+  },
+  {
+    id: 2,
+    category: "Track & Field",
+    aspect: "aspect-[3/4]",
+    src: "/photos/track-portrait.jpg",
+    alt: "Track athlete portrait",
+  },
+  {
+    id: 3,
+    category: "Track & Field",
+    aspect: "aspect-[4/5]",
+    src: "/photos/track-celebration.jpg",
+    alt: "Athletes celebrating after race",
+  },
+  {
+    id: 4,
+    category: "Cross Country",
+    aspect: "aspect-[4/3]",
+    src: "/photos/xc-finish.jpg",
+    alt: "Cross country finish line celebration",
+  },
+  {
+    id: 5,
+    category: "Cross Country",
+    aspect: "aspect-[3/2]",
+    src: "/photos/xc-autumn.jpg",
+    alt: "Cross country race in autumn",
+  },
 ];
 
-function PhotoPlaceholder({
+function PhotoCard({
   photo,
   index,
 }: {
@@ -27,7 +54,6 @@ function PhotoPlaceholder({
 }) {
   return (
     <motion.div
-      key={photo.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
@@ -35,33 +61,19 @@ function PhotoPlaceholder({
       className="break-inside-avoid mb-3"
     >
       <div className="group relative overflow-hidden rounded-xl cursor-pointer">
-        <div
-          className={`${photo.aspect} relative overflow-hidden`}
-          style={{ background: "linear-gradient(160deg, #141414 0%, #0a0a0a 100%)" }}
-        >
-          {/* Camera icon */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              className="text-white/10"
-            >
-              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </div>
-
+        <div className={`${photo.aspect} relative overflow-hidden bg-[#111]`}>
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
           {/* Hover overlay */}
-          <div className="absolute inset-0 bg-violet-600/0 group-hover:bg-violet-600/5 transition-colors duration-300" />
-          <div className="absolute inset-0 border border-white/0 group-hover:border-white/8 rounded-xl transition-colors duration-300" />
-
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
           {/* Category label */}
           <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <span className="text-xs font-mono text-white/35 tracking-widest uppercase">
+            <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
               {photo.category}
             </span>
           </div>
@@ -92,7 +104,7 @@ export default function Gallery() {
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
             01 / Gallery
           </span>
-          <div className="h-px flex-1 bg-white/5" />
+          <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
@@ -117,8 +129,8 @@ export default function Gallery() {
                 onClick={() => setActive(cat)}
                 className={`text-xs px-4 py-2 rounded-full font-mono transition-all duration-200 ${
                   active === cat
-                    ? "bg-white/10 text-white border border-white/20"
-                    : "text-white/30 border border-white/5 hover:text-white/60 hover:border-white/15"
+                    ? "bg-white text-black"
+                    : "text-white/40 border border-white/[0.08] hover:text-white/70 hover:border-white/20"
                 }`}
               >
                 {cat}
@@ -130,7 +142,7 @@ export default function Gallery() {
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-3">
           <AnimatePresence mode="popLayout">
             {filtered.map((photo, i) => (
-              <PhotoPlaceholder key={photo.id} photo={photo} index={i} />
+              <PhotoCard key={photo.id} photo={photo} index={i} />
             ))}
           </AnimatePresence>
         </div>

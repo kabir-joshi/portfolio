@@ -5,20 +5,20 @@ import { useRef, useState } from "react";
 import { EASE } from "@/lib/easing";
 
 const sessionTypes = [
-  "Portrait Session",
   "Event Coverage",
+  "Portrait Session",
   "Commercial / Custom",
   "Other",
 ];
 
 const socials = [
   { label: "Instagram", href: "#" },
-  { label: "Email", href: "mailto:hello@kabirj.com" },
+  { label: "Email", href: "mailto:mail@kabirj.com" },
   { label: "GitHub", href: "https://github.com/kabir-joshi" },
 ];
 
 const inputClass =
-  "w-full bg-white/[0.03] border border-white/8 rounded-xl px-4 py-3 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.05] transition-all duration-200";
+  "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all duration-200";
 
 export default function Booking() {
   const ref = useRef<HTMLDivElement>(null);
@@ -40,17 +40,12 @@ export default function Booking() {
       `Preferred date: ${date || "Flexible"}`,
       `\nMessage:\n${message}`,
     ].join("\n");
-    window.location.href = `mailto:hello@kabirj.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:mail@kabirj.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
-    <section id="booking" className="py-32 px-6 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-3xl" />
-      </div>
-
-      <div className="max-w-6xl mx-auto relative z-10">
+    <section id="booking" className="py-32 px-6">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           ref={ref}
           initial={{ opacity: 0, x: -20 }}
@@ -61,11 +56,11 @@ export default function Booking() {
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
             04 / Book
           </span>
-          <div className="h-px flex-1 bg-white/5" />
+          <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Left: heading + copy */}
+          {/* Left */}
           <div>
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
@@ -75,20 +70,19 @@ export default function Booking() {
             >
               <span className="text-white">Let&apos;s create</span>
               <br />
-              <span className="text-white/20">something.</span>
+              <span className="text-[#86868b]">something.</span>
             </motion.h2>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-white/40 text-lg mb-12 leading-relaxed"
+              className="text-[#86868b] text-lg mb-12 leading-relaxed"
             >
               Have a shoot in mind? Fill out the form and I&apos;ll get back to
               you within 24 hours.
             </motion.p>
 
-            {/* Socials */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
@@ -198,7 +192,7 @@ export default function Booking() {
 
             <button
               type="submit"
-              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-violet-200 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
+              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200"
             >
               Send inquiry
             </button>
@@ -211,12 +205,12 @@ export default function Booking() {
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.7, delay: 0.6 }}
-        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/5 flex items-center justify-between"
+        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/[0.06] flex items-center justify-between"
       >
-        <span className="text-xs text-white/15 font-mono">
+        <span className="text-xs text-white/20 font-mono">
           © {new Date().getFullYear()} Kabir Joshi
         </span>
-        <span className="text-xs text-white/15 font-mono">kabirj.com</span>
+        <span className="text-xs text-white/20 font-mono">kabirj.com</span>
       </motion.div>
     </section>
   );
