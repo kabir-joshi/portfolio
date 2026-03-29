@@ -7,15 +7,6 @@ import { EASE } from "@/lib/easing";
 const projects = [
   {
     number: "01",
-    title: "RunIQ",
-    description:
-      "A Strava-connected running analytics app. Visualizes your training data with insights and trends to help you run smarter.",
-    tags: ["Python", "Flask", "Strava API", "Render"],
-    href: "/runiq",
-    status: "Live",
-  },
-  {
-    number: "02",
     title: "F1 Manager",
     description:
       "A macOS Formula 1 team management simulation game built with SpriteKit and SwiftUI. Manage your team through a full season.",
@@ -24,10 +15,10 @@ const projects = [
     status: "In Development",
   },
   {
-    number: "03",
+    number: "02",
     title: "More coming soon",
     description:
-      "Always building something new. Check back here for updates on what I&apos;m working on next.",
+      "Always building something new. Check back here for updates on what I'm working on next.",
     tags: [],
     href: "#",
     status: "Soon",
@@ -126,7 +117,7 @@ export default function Projects() {
           className="flex items-center gap-4 mb-16"
         >
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
-            02 / Projects
+            05 / Projects
           </span>
           <div className="h-px flex-1 bg-white/5" />
         </motion.div>

@@ -285,6 +285,7 @@ export default function HorizontalGallery() {
 
             {/* Nav arrows */}
             <button
+              aria-label="Previous photo"
               className="absolute left-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
@@ -296,6 +297,7 @@ export default function HorizontalGallery() {
               ←
             </button>
             <button
+              aria-label="Next photo"
               className="absolute right-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
@@ -308,6 +310,7 @@ export default function HorizontalGallery() {
             </button>
 
             <button
+              aria-label="Close lightbox"
               className="absolute top-6 right-6 text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase transition-colors"
               onClick={() => setSelectedPhoto(null)}
             >

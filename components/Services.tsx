@@ -46,7 +46,7 @@ export default function Services() {
           className="flex items-center gap-4 mb-16"
         >
           <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
-            03 / Services
+            04 / Services
           </span>
           <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>

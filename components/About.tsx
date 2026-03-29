@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import Image from "next/image";
 import { EASE } from "@/lib/easing";
 
 function RevealLine({
@@ -29,9 +30,9 @@ function RevealLine({
 }
 
 const stats = [
-  { value: "—", label: "shoots covered" },
-  { value: "—", label: "years shooting" },
-  { value: "—", label: "events documented" },
+  { value: "50+", label: "shoots covered" },
+  { value: "2+", label: "years shooting" },
+  { value: "100+", label: "events documented" },
 ];
 
 export default function About() {
@@ -64,22 +65,15 @@ export default function About() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
           >
-            <div
-              className="aspect-[3/4] rounded-2xl relative overflow-hidden flex items-center justify-center border border-white/[0.06]"
-              style={{ background: "#0a0a0a" }}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-                className="text-white/10"
-              >
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
+            <div className="aspect-[3/4] rounded-2xl relative overflow-hidden">
+              <Image
+                src="/photos/finals-11.JPG"
+                alt="Athlete celebrates at the finish line"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
           </motion.div>
 

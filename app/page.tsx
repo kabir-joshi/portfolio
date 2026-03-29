@@ -3,8 +3,10 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HorizontalGallery from "@/components/HorizontalGallery";
 import About from "@/components/About";
+import Process from "@/components/Process";
 import PhotoBreak from "@/components/PhotoBreak";
 import Services from "@/components/Services";
+import Projects from "@/components/Projects";
 import Booking from "@/components/Booking";
 
 export default function Home() {
@@ -16,6 +18,7 @@ export default function Home() {
         <Hero />
         <HorizontalGallery />
         <About />
+        <Process />
         <PhotoBreak
           src="/photos/20251010-DSC02484.jpg"
           alt="Athlete celebrates with teammates after race"
@@ -23,6 +26,7 @@ export default function Home() {
           subcaption="©kabirjphoto"
         />
         <Services />
+        <Projects />
         <Booking />
       </main>
     </>

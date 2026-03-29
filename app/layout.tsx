@@ -14,7 +14,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Kabir Joshi — Photography",
-  description: "Photography portfolio and bookings — Kabir Joshi.",
+  description:
+    "Sports photography portfolio specializing in track & field, cross country, and road racing. Available for event coverage, portrait sessions, and commercial work.",
+  metadataBase: new URL("https://kabirj.com"),
+  openGraph: {
+    title: "Kabir Joshi — Photography",
+    description:
+      "Sports photography portfolio specializing in track & field, cross country, and road racing.",
+    url: "https://kabirj.com",
+    siteName: "Kabir Joshi Photography",
+    images: [{ url: "/photos/IMG_3786.JPG", width: 1200, height: 1500 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kabir Joshi — Photography",
+    description:
+      "Sports photography portfolio specializing in track & field, cross country, and road racing.",
+    images: ["/photos/IMG_3786.JPG"],
+  },
 };
 
 export default function RootLayout({
