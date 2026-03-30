@@ -29,6 +29,25 @@ export async function POST(
   return Response.json({ url: gallery.url });
 }
 
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!await isAdmin()) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const { date } = await request.json();
+
+  if (!date || isNaN(Date.parse(date))) {
+    return Response.json({ error: "Invalid date" }, { status: 400 });
+  }
+
+  await sql`UPDATE galleries SET created_at = ${new Date(date).toISOString()} WHERE id = ${id}`;
+  return Response.json({ ok: true });
+}
+
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
