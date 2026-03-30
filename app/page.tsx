@@ -6,6 +6,7 @@ import About from "@/components/About";
 import Process from "@/components/Process";
 import PhotoBreak from "@/components/PhotoBreak";
 import Services from "@/components/Services";
+import Reviews from "@/components/Reviews";
 import Booking from "@/components/Booking";
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
           subcaption="©kabirjphoto"
         />
         <Services />
+        <Reviews />
         <Booking />
       </main>
     </>
