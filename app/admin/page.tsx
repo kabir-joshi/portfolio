@@ -16,6 +16,7 @@ interface Gallery {
   title: string;
   url: string;
   pin: string | null;
+  gallery_password: string | null;
   created_at: string;
 }
 
@@ -33,6 +34,7 @@ export default function AdminPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [newGalleryPassword, setNewGalleryPassword] = useState("");
   const [adding, setAdding] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -95,7 +97,7 @@ export default function AdminPage() {
     const res = await fetch("/api/galleries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle, url: newUrl, pin: newPin }),
+      body: JSON.stringify({ title: newTitle, url: newUrl, pin: newPin, gallery_password: newGalleryPassword }),
     });
     if (res.ok) {
       const gallery = await res.json();
@@ -103,6 +105,7 @@ export default function AdminPage() {
       setNewTitle("");
       setNewUrl("");
       setNewPin("");
+      setNewGalleryPassword("");
     }
     setAdding(false);
   };
@@ -155,7 +158,7 @@ export default function AdminPage() {
         <section>
           <h2 className="text-lg font-semibold mb-6">Galleries</h2>
 
-          <form onSubmit={addGallery} className="grid sm:grid-cols-3 gap-3 mb-8">
+          <form onSubmit={addGallery} className="grid sm:grid-cols-2 gap-3 mb-8">
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
@@ -176,10 +179,16 @@ export default function AdminPage() {
               placeholder="Download pin (optional)"
               className={inputClass}
             />
+            <input
+              value={newGalleryPassword}
+              onChange={(e) => setNewGalleryPassword(e.target.value)}
+              placeholder="Gallery access password (optional)"
+              className={inputClass}
+            />
             <button
               type="submit"
               disabled={adding}
-              className="sm:col-span-3 py-2.5 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-40"
+              className="sm:col-span-2 py-2.5 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-40"
             >
               {adding ? "Adding..." : "Add gallery"}
             </button>
@@ -198,7 +207,10 @@ export default function AdminPage() {
                   <p className="text-sm font-medium text-white">{g.title}</p>
                   <p className="text-xs font-mono text-white/30 mt-0.5">{g.url}</p>
                   {g.pin && (
-                    <p className="text-xs font-mono text-white/40 mt-0.5">Pin: {g.pin}</p>
+                    <p className="text-xs font-mono text-white/40 mt-0.5">Download pin: {g.pin}</p>
+                  )}
+                  {g.gallery_password && (
+                    <p className="text-xs font-mono text-white/40 mt-0.5">Access password: {g.gallery_password}</p>
                   )}
                 </div>
                 <button
