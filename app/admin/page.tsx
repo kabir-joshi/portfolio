@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Cursor from "@/components/Cursor";
 
 interface Review {
   id: string;
@@ -107,12 +108,13 @@ export default function AdminPage() {
   };
 
   if (authed === null) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-white/20 text-sm font-mono">Loading...</div>;
+    return <><Cursor /><div className="min-h-screen bg-black flex items-center justify-center text-white/20 text-sm font-mono">Loading...</div></>;
   }
 
   if (!authed) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-6">
+        <Cursor />
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-4">
           <h1 className="text-white font-semibold text-xl mb-6">Admin</h1>
           <input
@@ -137,6 +139,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12">
+      <Cursor />
       <div className="max-w-4xl mx-auto space-y-16">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
