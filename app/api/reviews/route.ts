@@ -1,7 +1,6 @@
-import { promises as fs } from "fs";
-import path from "path";
+import { neon } from "@neondatabase/serverless";
 
-const DATA_FILE = path.join(process.cwd(), "data", "reviews.json");
+const sql = neon(process.env.DATABASE_URL!);
 
 interface Review {
   id: string;
@@ -11,21 +10,28 @@ interface Review {
   createdAt: string;
 }
 
-async function readReviews(): Promise<Review[]> {
-  try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8");
-    return JSON.parse(raw) as Review[];
-  } catch {
-    return [];
-  }
-}
-
-async function writeReviews(reviews: Review[]): Promise<void> {
-  await fs.writeFile(DATA_FILE, JSON.stringify(reviews, null, 2), "utf-8");
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name VARCHAR(100) NOT NULL,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+      body VARCHAR(1000) NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
 }
 
 export async function GET() {
-  const reviews = await readReviews();
+  await ensureTable();
+  const rows = await sql`SELECT * FROM reviews ORDER BY created_at DESC`;
+  const reviews: Review[] = rows.map((r) => ({
+    id: r.id as string,
+    name: r.name as string,
+    rating: r.rating as number,
+    body: r.body as string,
+    createdAt: r.created_at as string,
+  }));
   return Response.json(reviews);
 }
 
@@ -40,17 +46,19 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid input" }, { status: 400 });
   }
 
+  await ensureTable();
+  const rows = await sql`
+    INSERT INTO reviews (name, rating, body)
+    VALUES (${name}, ${rating}, ${reviewBody})
+    RETURNING id, name, rating, body, created_at
+  `;
+  const row = rows[0];
   const review: Review = {
-    id: crypto.randomUUID(),
-    name,
-    rating,
-    body: reviewBody,
-    createdAt: new Date().toISOString(),
+    id: row.id as string,
+    name: row.name as string,
+    rating: row.rating as number,
+    body: row.body as string,
+    createdAt: row.created_at as string,
   };
-
-  const reviews = await readReviews();
-  reviews.unshift(review);
-  await writeReviews(reviews);
-
   return Response.json(review, { status: 201 });
 }
