@@ -26,82 +26,97 @@ const inputClass =
 function GalleryRow({
   gallery,
   onDelete,
-  onDateChange,
+  onUpdate,
 }: {
   gallery: Gallery;
   onDelete: (id: string) => void;
-  onDateChange: (id: string, date: string) => void;
+  onUpdate: (id: string, updated: Partial<Gallery>) => void;
 }) {
-  const [editingDate, setEditingDate] = useState(false);
-  const [dateInput, setDateInput] = useState(
-    new Date(gallery.created_at).toISOString().slice(0, 10)
-  );
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(gallery.title);
+  const [url, setUrl] = useState(gallery.url ?? "");
+  const [pin, setPin] = useState(gallery.pin ?? "");
+  const [galleryPassword, setGalleryPassword] = useState(gallery.gallery_password ?? "");
+  const [date, setDate] = useState(new Date(gallery.created_at).toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
 
-  const saveDate = async () => {
+  const save = async () => {
     setSaving(true);
     const res = await fetch(`/api/galleries/${gallery.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date: dateInput }),
+      body: JSON.stringify({ title, url, pin, gallery_password: galleryPassword, date }),
     });
     if (res.ok) {
-      onDateChange(gallery.id, new Date(dateInput).toISOString());
-      setEditingDate(false);
+      onUpdate(gallery.id, {
+        title,
+        url,
+        pin: pin || null,
+        gallery_password: galleryPassword || null,
+        created_at: new Date(date).toISOString(),
+      });
+      setEditing(false);
     }
     setSaving(false);
   };
+
+  const cancel = () => {
+    setTitle(gallery.title);
+    setUrl(gallery.url ?? "");
+    setPin(gallery.pin ?? "");
+    setGalleryPassword(gallery.gallery_password ?? "");
+    setDate(new Date(gallery.created_at).toISOString().slice(0, 10));
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="p-4 rounded-xl border border-white/[0.12] bg-white/[0.03] space-y-3">
+        <div className="grid sm:grid-cols-2 gap-3">
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className={inputClass} />
+          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Pixieset URL" className={inputClass} />
+          <input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="Download pin (optional)" className={inputClass} />
+          <input value={galleryPassword} onChange={(e) => setGalleryPassword(e.target.value)} placeholder="Access password (optional)" className={inputClass} />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={save}
+            disabled={saving || !title || !url}
+            className="px-4 py-2 rounded-lg bg-white text-black text-xs font-medium hover:bg-white/90 transition-colors disabled:opacity-40"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            onClick={cancel}
+            className="px-4 py-2 rounded-lg border border-white/10 text-white/40 text-xs hover:text-white/70 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-between p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white">{gallery.title}</p>
         <p className="text-xs font-mono text-white/30 mt-0.5 truncate">{gallery.url}</p>
-        {gallery.pin && (
-          <p className="text-xs font-mono text-white/40 mt-0.5">Download pin: {gallery.pin}</p>
-        )}
-        {gallery.gallery_password && (
-          <p className="text-xs font-mono text-white/40 mt-0.5">Access password: {gallery.gallery_password}</p>
-        )}
-        <div className="flex items-center gap-2 mt-1.5">
-          {editingDate ? (
-            <>
-              <input
-                type="date"
-                value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                className="bg-white/[0.04] border border-white/10 rounded px-2 py-0.5 text-xs text-white/70 focus:outline-none focus:border-white/30"
-              />
-              <button
-                onClick={saveDate}
-                disabled={saving}
-                className="text-xs font-mono text-white/60 hover:text-white transition-colors disabled:opacity-40"
-              >
-                {saving ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={() => setEditingDate(false)}
-                className="text-xs font-mono text-white/30 hover:text-white/60 transition-colors"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => setEditingDate(true)}
-              className="text-xs font-mono text-white/25 hover:text-white/50 transition-colors"
-            >
-              {new Date(gallery.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })} · Edit date
-            </button>
-          )}
-        </div>
+        {gallery.pin && <p className="text-xs font-mono text-white/40 mt-0.5">Download pin: {gallery.pin}</p>}
+        {gallery.gallery_password && <p className="text-xs font-mono text-white/40 mt-0.5">Access password: {gallery.gallery_password}</p>}
+        <p className="text-xs font-mono text-white/25 mt-0.5">
+          {new Date(gallery.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+        </p>
       </div>
-      <button
-        onClick={() => onDelete(gallery.id)}
-        className="text-xs font-mono text-red-400/50 hover:text-red-400 transition-colors ml-4 shrink-0"
-      >
-        Delete
-      </button>
+      <div className="flex items-center gap-4 ml-4 shrink-0">
+        <button onClick={() => setEditing(true)} className="text-xs font-mono text-white/30 hover:text-white/60 transition-colors">
+          Edit
+        </button>
+        <button onClick={() => onDelete(gallery.id)} className="text-xs font-mono text-red-400/50 hover:text-red-400 transition-colors">
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
@@ -286,9 +301,9 @@ export default function AdminPage() {
                 key={g.id}
                 gallery={g}
                 onDelete={deleteGallery}
-                onDateChange={(id, date) =>
+                onUpdate={(id, updated) =>
                   setGalleries((prev) =>
-                    prev.map((x) => (x.id === id ? { ...x, created_at: date } : x))
+                    prev.map((x) => (x.id === id ? { ...x, ...updated } : x))
                   )
                 }
               />

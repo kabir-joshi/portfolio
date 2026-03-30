@@ -38,13 +38,31 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { date } = await request.json();
+  const body = await request.json();
 
+  const title = (body.title ?? "").trim().slice(0, 200);
+  const url = (body.url ?? "").trim();
+  const pin = (body.pin ?? "").trim().slice(0, 50) || null;
+  const galleryPassword = (body.gallery_password ?? "").trim().slice(0, 100) || null;
+  const date = body.date;
+
+  if (!title || !url) {
+    return Response.json({ error: "Title and URL required" }, { status: 400 });
+  }
   if (!date || isNaN(Date.parse(date))) {
     return Response.json({ error: "Invalid date" }, { status: 400 });
   }
 
-  await sql`UPDATE galleries SET created_at = ${new Date(date).toISOString()} WHERE id = ${id}`;
+  await sql`
+    UPDATE galleries
+    SET
+      title = ${title},
+      url = ${url},
+      pin = ${pin},
+      gallery_password = ${galleryPassword},
+      created_at = ${new Date(date).toISOString()}
+    WHERE id = ${id}
+  `;
   return Response.json({ ok: true });
 }
 
