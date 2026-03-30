@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EASE } from "@/lib/easing";
 
 const links = [
-  { label: "Gallery", href: "#gallery" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#projects" },
+  { label: "Gallery", href: "/#gallery" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Work", href: "/#projects" },
   { label: "Client Galleries", href: "/galleries" },
 ];
 
@@ -53,7 +53,7 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href="#booking"
+            href="/#booking"
             className="text-sm px-4 py-2 rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all duration-200"
           >
             Book a session
@@ -106,7 +106,7 @@ export default function Navbar() {
                 </a>
               ))}
               <a
-                href="#booking"
+                href="/#booking"
                 onClick={() => setMenuOpen(false)}
                 className="text-white/60 hover:text-white transition-colors text-lg"
               >

@@ -33,6 +33,13 @@ export const metadata: Metadata = {
       "Sports photography portfolio specializing in track & field, cross country, and road racing.",
     images: ["/photos/IMG_3786.JPG"],
   },
+  alternates: {
+    canonical: "https://kabirj.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
