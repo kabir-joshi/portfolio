@@ -81,10 +81,6 @@ const sections = [
         q: "Can I request specific shots?",
         a: "Absolutely. Let me know athletes to focus on, specific moments, or locations beforehand and I'll prioritize them.",
       },
-      {
-        q: "What equipment do you use?",
-        a: "Sony mirrorless system with telephoto lenses suited for fast-moving subjects in varied lighting conditions.",
-      },
     ],
   },
 ];
