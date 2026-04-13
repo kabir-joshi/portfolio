@@ -178,14 +178,7 @@ export default function HorizontalGallery() {
                   transition={{ duration: 0.7, delay: 0.1 + i * 0.06, ease: EASE }}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setSelectedPhoto(i)}
-                  onMouseEnter={() =>
-                    window.dispatchEvent(
-                      new CustomEvent("cursor:enter", { detail: "View" })
-                    )
-                  }
-                  onMouseLeave={() =>
-                    window.dispatchEvent(new Event("cursor:leave"))
-                  }
+
                 >
                   <Image
                     src={photo.src}

@@ -1,4 +1,3 @@
-import Cursor from "@/components/Cursor";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HorizontalGallery from "@/components/HorizontalGallery";
@@ -12,7 +11,6 @@ import Booking from "@/components/Booking";
 export default function Home() {
   return (
     <>
-      <Cursor />
       <main className="bg-black">
         <Navbar />
         <Hero />

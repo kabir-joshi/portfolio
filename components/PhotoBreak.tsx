@@ -37,14 +37,7 @@ export default function PhotoBreak({
           fill
           className="object-cover"
           sizes="100vw"
-          onMouseEnter={() =>
-            window.dispatchEvent(
-              new CustomEvent("cursor:enter", { detail: "View" })
-            )
-          }
-          onMouseLeave={() =>
-            window.dispatchEvent(new Event("cursor:leave"))
-          }
+
         />
       </motion.div>
 
