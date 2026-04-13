@@ -8,7 +8,6 @@ import {
   useSpring,
   AnimatePresence,
   useInView,
-  animate,
 } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
@@ -34,7 +33,8 @@ export default function HorizontalGallery() {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const lightboxTouchStartX = useRef(0);
-  const scrollEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isHorizGesture = useRef(false);
+  const horizLockTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inView = useInView(headerRef, { once: true });
 
@@ -62,28 +62,28 @@ export default function HorizontalGallery() {
     return () => window.removeEventListener("resize", measure);
   }, [x]);
 
-  // Intercept horizontal wheel; let vertical scroll pass through untouched
+  // Intercept horizontal wheel; let vertical scroll pass through untouched.
+  // Once a horizontal gesture is detected, hold the lock for 150ms so that
+  // OS momentum events (which can have varying deltaX/deltaY ratios) are all
+  // captured and the deceleration stays smooth.
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       const absX = Math.abs(e.deltaX);
       const absY = Math.abs(e.deltaY);
 
-      if (absX > absY && absX > 3) {
+      if (!isHorizGesture.current && absX > absY && absX > 2) {
+        isHorizGesture.current = true;
+      }
+
+      if (isHorizGesture.current && absX > 0) {
         e.preventDefault();
-
-        // Cancel any running inertia animation and apply delta directly
-        if (scrollEndTimer.current) clearTimeout(scrollEndTimer.current);
-        x.stop();
-
         const next = Math.max(-overflowRef.current, Math.min(0, x.get() - e.deltaX));
         x.set(next);
 
-        // After wheel events stop, add a brief settling snap to avoid sub-pixel fuzz
-        scrollEndTimer.current = setTimeout(() => {
-          const cur = x.get();
-          const snapped = Math.max(-overflowRef.current, Math.min(0, cur));
-          if (cur !== snapped) x.set(snapped);
-        }, 80);
+        if (horizLockTimer.current) clearTimeout(horizLockTimer.current);
+        horizLockTimer.current = setTimeout(() => {
+          isHorizGesture.current = false;
+        }, 150);
       }
     },
     [x]
