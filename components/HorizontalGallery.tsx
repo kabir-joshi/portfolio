@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import {
   motion,
-  useScroll,
+  useMotionValue,
   useTransform,
   useSpring,
   AnimatePresence,
@@ -29,47 +29,99 @@ export default function HorizontalGallery() {
   const trackRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
-  const [containerHeight, setContainerHeight] = useState("600vh");
-  const [overflow, setOverflow] = useState(0);
+  const overflowRef = useRef(0);
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const lightboxTouchStartX = useRef(0);
 
   const inView = useInView(headerRef, { once: true });
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
+  // Driven by horizontal scroll / swipe — not tied to vertical scroll
+  const trackXMV = useMotionValue(0);
+  const x = useSpring(trackXMV, { stiffness: 80, damping: 22, mass: 0.6, restDelta: 0.5 });
 
-  // Ease-in/out at the start and end so it doesn't jerk
-  const rawX = useTransform(
-    scrollYProgress,
-    [0, 0.04, 0.96, 1],
-    [0, 0, -overflow, -overflow]
+  // Progress bar follows the spring output so it lags naturally
+  const progressRaw = useTransform(x, (val) =>
+    overflowRef.current > 0 ? Math.max(0, Math.min(1, -val / overflowRef.current)) : 0
   );
-
-  // Spring adds inertia — feels like the track has weight
-  const x = useSpring(rawX, { stiffness: 80, damping: 22, mass: 0.6, restDelta: 0.5 });
-
-  const progressScaleX = useSpring(
-    useTransform(scrollYProgress, [0, 1], [0, 1]),
-    { stiffness: 80, damping: 22, mass: 0.6 }
-  );
+  const progressScaleX = useSpring(progressRaw, { stiffness: 80, damping: 22, mass: 0.6 });
 
   useEffect(() => {
     const measure = () => {
       if (!trackRef.current) return;
       const tw = trackRef.current.scrollWidth;
       const ww = window.innerWidth;
-      const wh = window.innerHeight;
       const ov = Math.max(0, tw - ww);
-      setOverflow(ov);
-      // Extra vh so last photo fully rests before scroll resumes
-      setContainerHeight(`${ov + wh * 1.4}px`);
+      overflowRef.current = ov;
+      // Clamp current position in case viewport shrank
+      const clamped = Math.max(-ov, Math.min(0, trackXMV.get()));
+      trackXMV.set(clamped);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, []);
+  }, [trackXMV]);
+
+  // Intercept horizontal wheel; let vertical scroll pass through untouched
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+
+      if (absX > absY && absX > 3) {
+        e.preventDefault();
+        const next = Math.max(-overflowRef.current, Math.min(0, trackXMV.get() - e.deltaX));
+        trackXMV.set(next);
+      }
+      // Vertical scroll is not prevented — page keeps scrolling
+    },
+    [trackXMV]
+  );
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [handleWheel]);
+
+  // Touch: detect direction on move and either pan gallery or let vertical scroll through
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let locked: "x" | "y" | null = null;
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      locked = null;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const dx = touchStartX.current - e.touches[0].clientX;
+      const dy = touchStartY.current - e.touches[0].clientY;
+
+      if (!locked) {
+        locked = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+
+      if (locked === "x") {
+        e.preventDefault();
+        const next = Math.max(-overflowRef.current, Math.min(0, trackXMV.get() - dx));
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        trackXMV.set(next);
+      }
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
+  }, [trackXMV]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -94,112 +146,105 @@ export default function HorizontalGallery() {
       <section
         id="gallery"
         ref={containerRef}
-        style={{ height: containerHeight }}
-        className="relative hidden md:block"
+        className="relative hidden md:flex md:flex-col h-screen overflow-hidden"
       >
-        <div className="sticky top-0 h-screen overflow-hidden flex flex-col">
-          {/* Header */}
-          <div
-            ref={headerRef}
-            className="flex items-center justify-between px-10 pt-10 pb-6 shrink-0"
+        {/* Header */}
+        <div
+          ref={headerRef}
+          className="flex items-center justify-between px-10 pt-10 pb-6 shrink-0"
+        >
+          <motion.span
+            initial={{ opacity: 0, x: -16 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase"
           >
+            01 / Gallery
+          </motion.span>
+
+          {/* Scroll hint */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex items-center gap-2 text-xs font-mono text-white/20 tracking-widest uppercase"
+          >
+            scroll sideways
             <motion.span
-              initial={{ opacity: 0, x: -16 }}
-              animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.5 }}
-              className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase"
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
             >
-              01 / Gallery
+              →
             </motion.span>
+          </motion.div>
+        </div>
 
-            {/* Animated scroll hint */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex items-center gap-2 text-xs font-mono text-white/20 tracking-widest uppercase"
-            >
-              scroll
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                →
-              </motion.span>
-            </motion.div>
-          </div>
-
-          {/* Track */}
-          <div className="flex-1 flex items-center overflow-hidden">
-            <motion.div
-              ref={trackRef}
-              className="flex gap-5 pl-[10vw]"
-              style={{ x }}
-            >
-              {photos.map((photo, i) => (
-                <motion.div
-                  key={photo.id}
-                  className="shrink-0 relative overflow-hidden rounded-2xl group cursor-pointer"
-                  style={{
-                    height: "62vh",
-                    width: `calc(62vh * ${photo.ratio})`,
-                  }}
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 0.05 + i * 0.07, ease: EASE }}
-                  onClick={() => setSelectedPhoto(i)}
-                >
-                  {/* Image scales on hover, not the card */}
-                  <motion.div
-                    className="absolute inset-0"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.5, ease: EASE }}
-                  >
-                    <Image
-                      src={photo.src}
-                      alt={photo.alt}
-                      fill
-                      className="object-cover"
-                      sizes="60vw"
-                    />
-                  </motion.div>
-
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400" />
-
-                  {/* Category label */}
-                  <motion.div
-                    className="absolute bottom-4 left-4"
-                    initial={{ opacity: 0, y: 6 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
-                      {photo.category}
-                    </span>
-                  </motion.div>
-                </motion.div>
-              ))}
-              {/* Trailing spacer */}
-              <div className="shrink-0 w-[10vw]" />
-            </motion.div>
-          </div>
-
-          {/* Progress bar + gallery link */}
-          <div className="flex items-center gap-6 mx-10 mb-8 shrink-0">
-            <div className="h-px flex-1 bg-white/[0.06]">
+        {/* Track */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <motion.div
+            ref={trackRef}
+            className="flex gap-5 pl-[10vw]"
+            style={{ x }}
+          >
+            {photos.map((photo, i) => (
               <motion.div
-                className="h-full bg-white/25 origin-left"
-                style={{ scaleX: progressScaleX }}
-              />
-            </div>
-            <a
-              href="/galleries"
-              className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200 shrink-0"
-            >
-              Client galleries →
-            </a>
+                key={photo.id}
+                className="shrink-0 relative overflow-hidden rounded-2xl group cursor-pointer"
+                style={{
+                  height: "62vh",
+                  width: `calc(62vh * ${photo.ratio})`,
+                }}
+                initial={{ opacity: 0, y: 40 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.05 + i * 0.07, ease: EASE }}
+                onClick={() => setSelectedPhoto(i)}
+              >
+                <motion.div
+                  className="absolute inset-0"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    className="object-cover"
+                    sizes="60vw"
+                  />
+                </motion.div>
+
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400" />
+
+                <motion.div
+                  className="absolute bottom-4 left-4"
+                  initial={{ opacity: 0, y: 6 }}
+                  whileHover={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
+                    {photo.category}
+                  </span>
+                </motion.div>
+              </motion.div>
+            ))}
+            <div className="shrink-0 w-[10vw]" />
+          </motion.div>
+        </div>
+
+        {/* Progress bar + gallery link */}
+        <div className="flex items-center gap-6 mx-10 mb-8 shrink-0">
+          <div className="h-px flex-1 bg-white/[0.06]">
+            <motion.div
+              className="h-full bg-white/25 origin-left"
+              style={{ scaleX: progressScaleX }}
+            />
           </div>
+          <a
+            href="/galleries"
+            className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200 shrink-0"
+          >
+            Client galleries →
+          </a>
         </div>
       </section>
 
@@ -256,9 +301,9 @@ export default function HorizontalGallery() {
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-[500] bg-black/95 flex items-center justify-center"
             onClick={() => setSelectedPhoto(null)}
-            onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+            onTouchStart={(e) => { lightboxTouchStartX.current = e.touches[0].clientX; }}
             onTouchEnd={(e) => {
-              const delta = touchStartX.current - e.changedTouches[0].clientX;
+              const delta = lightboxTouchStartX.current - e.changedTouches[0].clientX;
               if (Math.abs(delta) > 50) {
                 e.stopPropagation();
                 setSelectedPhoto((p) =>
