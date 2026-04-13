@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EASE } from "@/lib/easing";
 
 const links = [
-  { label: "Gallery", href: "/#gallery" },
-  { label: "About", href: "/#about" },
-  { label: "Services", href: "/#services" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "FAQ", href: "/faq" },
   { label: "Client Galleries", href: "/galleries" },
 ];
 
