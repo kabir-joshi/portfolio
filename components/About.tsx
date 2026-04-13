@@ -91,13 +91,13 @@ export default function About() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Photo with slide-up reveal */}
+          {/* Photo with clip-path reveal */}
           <div className="aspect-[3/4] rounded-2xl overflow-hidden relative">
             <motion.div
               className="absolute inset-0"
-              initial={{ y: "100%" }}
-              animate={inView ? { y: "0%" } : {}}
-              transition={{ duration: 1.1, delay: 0.1, ease: EASE }}
+              initial={{ clipPath: "inset(0 0 100% 0)" }}
+              animate={inView ? { clipPath: "inset(0 0 0% 0)" } : {}}
+              transition={{ duration: 1.2, delay: 0.1, ease: EASE }}
             >
               <Image
                 src="/photos/finals-11.JPG"

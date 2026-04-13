@@ -1,8 +1,43 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
+import { useCallback, useRef } from "react";
 import { EASE } from "@/lib/easing";
+
+function TiltCard({ children, className }: { children: React.ReactNode; className: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springX = useSpring(rotateX, { stiffness: 220, damping: 22 });
+  const springY = useSpring(rotateY, { stiffness: 220, damping: 22 });
+
+  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = ref.current!.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateY.set(x * 10);
+    rotateX.set(-y * 10);
+  }, [rotateX, rotateY]);
+
+  const onLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+  }, [rotateX, rotateY]);
+
+  return (
+    <div style={{ perspective: 900 }}>
+      <motion.div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{ rotateX: springX, rotateY: springY, transformStyle: "preserve-3d" }}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 const services = [
   {
@@ -70,9 +105,8 @@ export default function Services() {
               initial={{ opacity: 0, y: 50 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
-              whileHover={{ y: -4 }}
-              className="group relative flex flex-col p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default"
             >
+            <TiltCard className="group relative flex flex-col p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default">
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/20">{service.number}</span>
                 <span className="text-xs font-mono text-white/40">{service.price}</span>
@@ -105,6 +139,7 @@ export default function Services() {
                   →
                 </span>
               </a>
+            </TiltCard>
             </motion.div>
           ))}
         </div>

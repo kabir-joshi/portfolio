@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring } from "fram
 import type { Variants } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -89,10 +89,34 @@ export default function Hero() {
   }, []);
   const heroName = useScramble("Kabir Joshi", scrambleActive);
 
+  // Mouse parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const imageParallaxX = useSpring(useTransform(mouseX, [-0.5, 0.5], [18, -18]), { stiffness: 50, damping: 18 });
+  const imageParallaxY = useSpring(useTransform(mouseY, [-0.5, 0.5], [12, -12]), { stiffness: 50, damping: 18 });
+
+  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    mouseX.set((e.clientX - left) / width - 0.5);
+    mouseY.set((e.clientY - top) / height - 0.5);
+  }, [mouseX, mouseY]);
+
+  const onMouseLeave = useCallback(() => {
+    mouseX.set(0);
+    mouseY.set(0);
+  }, [mouseX, mouseY]);
+
   return (
-    <section className="relative h-screen overflow-hidden">
-      {/* Hero photo with parallax zoom */}
-      <motion.div className="absolute inset-0" style={{ scale: imageScale }}>
+    <section
+      className="relative h-screen overflow-hidden"
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+    >
+      {/* Hero photo with parallax zoom + mouse parallax */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ scale: imageScale, x: imageParallaxX, y: imageParallaxY }}
+      >
         <Image
           src="/photos/IMG_3786.JPG"
           alt="Elite marathon runner"
@@ -100,6 +124,7 @@ export default function Hero() {
           priority
           className="object-cover object-center"
           sizes="100vw"
+          data-cursor-view
         />
       </motion.div>
 
