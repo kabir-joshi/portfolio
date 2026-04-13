@@ -165,17 +165,24 @@ export default function Booking() {
               <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
                 Session type
               </label>
-              <select
-                value={session}
-                onChange={(e) => setSession(e.target.value)}
-                className={`${inputClass} cursor-pointer`}
-              >
-                {sessionTypes.map((type) => (
-                  <option key={type} value={type} className="bg-[#111]">
-                    {type}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={session}
+                  onChange={(e) => setSession(e.target.value)}
+                  className={`${inputClass} appearance-none cursor-pointer pr-10`}
+                >
+                  {sessionTypes.map((type) => (
+                    <option key={type} value={type} className="bg-[#111]">
+                      {type}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/30">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 4.5L6 8.5L10 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
             </div>
 
             <div>
