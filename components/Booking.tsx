@@ -28,18 +28,33 @@ export default function Booking() {
   const [session, setSession] = useState(sessionTypes[0]);
   const [date, setDate] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = `Photography Booking — ${session}`;
-    const body = [
-      `Name: ${name}`,
-      `Email: ${email}`,
-      `Session type: ${session}`,
-      `Preferred date: ${date || "Flexible"}`,
-      `\nMessage:\n${message}`,
-    ].join("\n");
-    window.location.href = `mailto:mail@kabirj.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setStatus("submitting");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          session_type: session,
+          preferred_date: date,
+          message,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus("done");
+      setName("");
+      setEmail("");
+      setSession(sessionTypes[0]);
+      setDate("");
+      setMessage("");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -191,10 +206,22 @@ export default function Booking() {
 
             <button
               type="submit"
-              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200"
+              disabled={status === "submitting" || status === "done"}
+              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Send inquiry
+              {status === "submitting" ? "Sending..." : status === "done" ? "Sent!" : "Send inquiry"}
             </button>
+
+            {status === "done" && (
+              <p className="text-xs font-mono text-white/40 text-center">
+                Got it — I&apos;ll get back to you within 24 hours.
+              </p>
+            )}
+            {status === "error" && (
+              <p className="text-xs font-mono text-red-400/60 text-center">
+                Something went wrong. Try emailing me directly at mail@kabirj.com
+              </p>
+            )}
           </motion.form>
         </div>
       </div>
@@ -209,7 +236,22 @@ export default function Booking() {
         <span className="text-xs text-white/20 font-mono">
           © {new Date().getFullYear()} Kabir Joshi
         </span>
-        <span className="text-xs text-white/20 font-mono">kabirj.com</span>
+        <div className="flex items-center gap-6">
+          <a
+            href="https://www.instagram.com/kabirjphoto/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-white/20 font-mono hover:text-white/50 transition-colors duration-200"
+          >
+            Instagram
+          </a>
+          <a
+            href="mailto:mail@kabirj.com"
+            className="text-xs text-white/20 font-mono hover:text-white/50 transition-colors duration-200"
+          >
+            mail@kabirj.com
+          </a>
+        </div>
       </motion.div>
     </section>
   );

@@ -84,6 +84,7 @@ export default function HorizontalGallery() {
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const [containerHeight, setContainerHeight] = useState("600vh");
   const [overflow, setOverflow] = useState(0);
+  const touchStartX = useRef(0);
 
   const inView = useInView(headerRef, { once: true });
 
@@ -200,12 +201,20 @@ export default function HorizontalGallery() {
             </motion.div>
           </div>
 
-          {/* Progress bar */}
-          <div className="h-px bg-white/[0.06] mx-10 mb-8 shrink-0">
-            <motion.div
-              className="h-full bg-white/30 origin-left"
-              style={{ scaleX: progressScaleX }}
-            />
+          {/* Progress bar + gallery link */}
+          <div className="flex items-center gap-6 mx-10 mb-8 shrink-0">
+            <div className="h-px flex-1 bg-white/[0.06]">
+              <motion.div
+                className="h-full bg-white/30 origin-left"
+                style={{ scaleX: progressScaleX }}
+              />
+            </div>
+            <a
+              href="/galleries"
+              className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200 shrink-0"
+            >
+              Client galleries →
+            </a>
           </div>
         </div>
       </section>
@@ -243,6 +252,14 @@ export default function HorizontalGallery() {
             </motion.div>
           ))}
         </div>
+        <div className="mt-10 text-center">
+          <a
+            href="/galleries"
+            className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200"
+          >
+            Client galleries →
+          </a>
+        </div>
       </section>
 
       {/* ─── Lightbox ─── */}
@@ -255,6 +272,20 @@ export default function HorizontalGallery() {
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-[500] bg-black/95 flex items-center justify-center"
             onClick={() => setSelectedPhoto(null)}
+            onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              const delta = touchStartX.current - e.changedTouches[0].clientX;
+              if (Math.abs(delta) > 50) {
+                e.stopPropagation();
+                setSelectedPhoto((p) =>
+                  p !== null
+                    ? delta > 0
+                      ? (p + 1) % photos.length
+                      : (p - 1 + photos.length) % photos.length
+                    : null
+                );
+              }
+            }}
           >
             <motion.div
               initial={{ scale: 0.93, opacity: 0 }}

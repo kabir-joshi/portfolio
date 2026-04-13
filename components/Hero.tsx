@@ -70,7 +70,7 @@ export default function Hero() {
           variants={itemVariants}
           className="text-lg md:text-xl text-white/60 max-w-md mx-auto leading-relaxed mb-12"
         >
-          Capturing moments. Creating stories.
+          Every stride, every finish, every story worth telling.
         </motion.p>
 
         <motion.div

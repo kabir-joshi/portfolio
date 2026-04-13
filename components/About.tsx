@@ -31,7 +31,7 @@ function RevealLine({
 
 const stats = [
   { value: "50+", label: "shoots covered" },
-  { value: "2+", label: "years shooting" },
+  { value: "200+", label: "athletes photographed" },
   { value: "100+", label: "events documented" },
 ];
 

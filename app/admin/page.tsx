@@ -10,6 +10,16 @@ interface Review {
   createdAt: string;
 }
 
+interface Inquiry {
+  id: string;
+  name: string;
+  email: string;
+  session_type: string;
+  preferred_date: string | null;
+  message: string | null;
+  created_at: string;
+}
+
 interface Gallery {
   id: string;
   title: string;
@@ -127,6 +137,7 @@ export default function AdminPage() {
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
 
   const [newTitle, setNewTitle] = useState("");
   const [newUrl, setNewUrl] = useState("");
@@ -135,14 +146,15 @@ export default function AdminPage() {
   const [adding, setAdding] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const [rv, gv] = await Promise.all([
+    const [rv, gv, iq] = await Promise.all([
       fetch("/api/reviews").then((r) => r.json()),
       fetch("/api/galleries").then((r) => r.json()),
+      fetch("/api/contact").then((r) => r.json()),
     ]);
     setReviews(rv);
-    // Fetch galleries with pins for admin
     const withPins = await fetch("/api/admin/galleries").then((r) => r.json()).catch(() => gv);
     setGalleries(withPins);
+    setInquiries(iq);
   }, []);
 
   useEffect(() => {
@@ -238,7 +250,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-12">
-      <Cursor />
       <div className="max-w-4xl mx-auto space-y-16">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
@@ -305,6 +316,32 @@ export default function AdminPage() {
                   )
                 }
               />
+            ))}
+          </div>
+        </section>
+
+        {/* Inquiries */}
+        <section>
+          <h2 className="text-lg font-semibold mb-6">Booking Inquiries</h2>
+          <div className="space-y-3">
+            {inquiries.length === 0 && (
+              <p className="text-white/20 text-sm font-mono">No inquiries yet.</p>
+            )}
+            {inquiries.map((inq) => (
+              <div
+                key={inq.id}
+                className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-white">{inq.name}</span>
+                  <span className="text-xs font-mono text-white/25">
+                    {new Date(inq.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+                <p className="text-xs font-mono text-white/40">{inq.email}</p>
+                <p className="text-xs font-mono text-white/30">{inq.session_type}{inq.preferred_date ? ` · ${inq.preferred_date}` : ""}</p>
+                {inq.message && <p className="text-xs text-white/40 leading-relaxed pt-1">{inq.message}</p>}
+              </div>
             ))}
           </div>
         </section>

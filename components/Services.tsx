@@ -8,6 +8,7 @@ const services = [
   {
     number: "01",
     title: "Event Coverage",
+    price: "From $150",
     description:
       "Track & field meets, cross country races, road races. Half-day or full-day. Every key moment documented.",
     details: ["Half or full day", "Multiple events/locations", "Turnaround within 2 weeks"],
@@ -16,6 +17,7 @@ const services = [
   {
     number: "02",
     title: "Portrait Session",
+    price: "From $75",
     description:
       "Individual or team athlete portraits. Studio or on location. Built around your story.",
     details: ["1–2 hours", "Outdoor or studio", "Edited gallery delivered"],
@@ -24,6 +26,7 @@ const services = [
   {
     number: "03",
     title: "Commercial & Custom",
+    price: "Custom pricing",
     description:
       "Brand shoots, editorial, and custom projects. Let's build something together from the ground up.",
     details: ["Custom scope", "Usage licensing available", "Creative collaboration"],
@@ -70,9 +73,10 @@ export default function Services() {
               whileHover={{ y: -4 }}
               className="group relative p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default"
             >
-              <span className="text-xs font-mono text-white/20 mb-6 block">
-                {service.number}
-              </span>
+              <div className="flex items-center justify-between mb-6">
+                <span className="text-xs font-mono text-white/20">{service.number}</span>
+                <span className="text-xs font-mono text-white/40">{service.price}</span>
+              </div>
               <h3 className="text-2xl font-bold text-white mb-3">
                 {service.title}
               </h3>
