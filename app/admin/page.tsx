@@ -18,6 +18,8 @@ interface Inquiry {
   session_type: string;
   preferred_date: string | null;
   message: string | null;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  admin_notes: string | null;
   created_at: string;
 }
 
@@ -32,6 +34,229 @@ interface Gallery {
 
 const inputClass =
   "w-full bg-white/[0.04] border border-white/10 rounded-lg px-3 py-2 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors";
+
+// ─── Status config ───────────────────────────────────────────────────────────
+
+const STATUS_CONFIG = {
+  pending: {
+    label: "Pending",
+    badge: "text-amber-400/90 bg-amber-400/[0.08] border-amber-400/25",
+    dot: "bg-amber-400",
+  },
+  confirmed: {
+    label: "Confirmed",
+    badge: "text-emerald-400/90 bg-emerald-400/[0.08] border-emerald-400/25",
+    dot: "bg-emerald-400",
+  },
+  completed: {
+    label: "Completed",
+    badge: "text-sky-400/90 bg-sky-400/[0.08] border-sky-400/25",
+    dot: "bg-sky-400",
+  },
+  cancelled: {
+    label: "Cancelled",
+    badge: "text-red-400/60 bg-red-400/[0.06] border-red-400/20",
+    dot: "bg-red-400/60",
+  },
+} as const;
+
+type StatusFilter = "all" | Inquiry["status"];
+
+// ─── Action button ────────────────────────────────────────────────────────────
+
+function ActionBtn({
+  children,
+  onClick,
+  disabled,
+  variant,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled: boolean;
+  variant: "confirm" | "cancel" | "complete" | "reopen";
+}) {
+  const styles = {
+    confirm:
+      "text-emerald-400/80 border-emerald-400/25 hover:bg-emerald-400/10",
+    cancel: "text-red-400/60 border-red-400/20 hover:bg-red-400/10",
+    complete: "text-sky-400/80 border-sky-400/25 hover:bg-sky-400/10",
+    reopen: "text-white/40 border-white/10 hover:bg-white/[0.05]",
+  };
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`px-3 py-1.5 rounded-lg border text-[11px] font-mono transition-colors disabled:opacity-40 ${styles[variant]}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── Booking card ─────────────────────────────────────────────────────────────
+
+function BookingCard({
+  inquiry,
+  onDelete,
+  onUpdate,
+}: {
+  inquiry: Inquiry;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, updated: Partial<Inquiry>) => void;
+}) {
+  const [notes, setNotes] = useState(inquiry.admin_notes ?? "");
+  const [showNotes, setShowNotes] = useState(!!inquiry.admin_notes);
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const changeStatus = async (status: Inquiry["status"]) => {
+    setBusy(true);
+    const res = await fetch(`/api/contact/${inquiry.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (res.ok) onUpdate(inquiry.id, { status });
+    setBusy(false);
+  };
+
+  const saveNotes = async () => {
+    setSavingNotes(true);
+    await fetch(`/api/contact/${inquiry.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin_notes: notes }),
+    });
+    onUpdate(inquiry.id, { admin_notes: notes.trim() || null });
+    setSavingNotes(false);
+  };
+
+  const cfg = STATUS_CONFIG[inquiry.status];
+  const notesDirty = notes !== (inquiry.admin_notes ?? "");
+
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+      {/* Top bar */}
+      <div className="px-5 py-4 space-y-2">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
+              <span className="text-sm font-semibold text-white">{inquiry.name}</span>
+              <span
+                className={`inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-full border ${cfg.badge}`}
+              >
+                <span className={`w-1 h-1 rounded-full ${cfg.dot}`} />
+                {cfg.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap text-xs font-mono text-white/35">
+              <a
+                href={`mailto:${inquiry.email}?subject=Re: Your booking inquiry`}
+                className="hover:text-white/70 transition-colors underline underline-offset-2 decoration-white/15"
+              >
+                {inquiry.email}
+              </a>
+              <span className="text-white/15">·</span>
+              <span>{inquiry.session_type}</span>
+              {inquiry.preferred_date && (
+                <>
+                  <span className="text-white/15">·</span>
+                  <span>{inquiry.preferred_date}</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="text-[11px] font-mono text-white/20">
+              {new Date(inquiry.created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+            <button
+              onClick={() => onDelete(inquiry.id)}
+              className="text-[11px] font-mono text-red-400/35 hover:text-red-400/80 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+
+        {inquiry.message && (
+          <p className="text-xs text-white/35 leading-relaxed pl-3 border-l border-white/[0.06]">
+            {inquiry.message}
+          </p>
+        )}
+      </div>
+
+      {/* Notes */}
+      {showNotes && (
+        <div className="px-5 pb-3 space-y-2 border-t border-white/[0.04] pt-3">
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Private notes (only visible to you)..."
+            rows={2}
+            className={`${inputClass} resize-none text-xs`}
+          />
+          {notesDirty && (
+            <button
+              onClick={saveNotes}
+              disabled={savingNotes}
+              className="px-3 py-1.5 rounded-lg bg-white/[0.06] text-white/50 text-[11px] font-mono hover:bg-white/[0.1] transition-colors disabled:opacity-40"
+            >
+              {savingNotes ? "Saving..." : "Save notes"}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Action bar */}
+      <div className="px-5 py-3 border-t border-white/[0.04] flex items-center justify-between gap-3 flex-wrap bg-white/[0.01]">
+        <div className="flex items-center gap-2 flex-wrap">
+          {inquiry.status === "pending" && (
+            <>
+              <ActionBtn onClick={() => changeStatus("confirmed")} disabled={busy} variant="confirm">
+                Confirm
+              </ActionBtn>
+              <ActionBtn onClick={() => changeStatus("cancelled")} disabled={busy} variant="cancel">
+                Cancel
+              </ActionBtn>
+            </>
+          )}
+          {inquiry.status === "confirmed" && (
+            <>
+              <ActionBtn onClick={() => changeStatus("completed")} disabled={busy} variant="complete">
+                Mark complete
+              </ActionBtn>
+              <ActionBtn onClick={() => changeStatus("cancelled")} disabled={busy} variant="cancel">
+                Cancel
+              </ActionBtn>
+            </>
+          )}
+          {(inquiry.status === "completed" || inquiry.status === "cancelled") && (
+            <ActionBtn onClick={() => changeStatus("pending")} disabled={busy} variant="reopen">
+              Reopen
+            </ActionBtn>
+          )}
+        </div>
+        <button
+          onClick={() => setShowNotes((v) => !v)}
+          className={`text-[11px] font-mono transition-colors ${
+            showNotes || inquiry.admin_notes
+              ? "text-white/40 hover:text-white/60"
+              : "text-white/20 hover:text-white/40"
+          }`}
+        >
+          {showNotes ? "Hide notes" : inquiry.admin_notes ? "Notes ↑" : "Add notes"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Gallery row ──────────────────────────────────────────────────────────────
 
 function GalleryRow({
   gallery,
@@ -130,6 +355,8 @@ function GalleryRow({
     </div>
   );
 }
+
+// ─── Review row ───────────────────────────────────────────────────────────────
 
 function ReviewRow({
   review,
@@ -233,6 +460,8 @@ function ReviewRow({
   );
 }
 
+// ─── Main admin page ──────────────────────────────────────────────────────────
+
 export default function AdminPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [password, setPassword] = useState("");
@@ -241,6 +470,7 @@ export default function AdminPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const [newTitle, setNewTitle] = useState("");
   const [newUrl, setNewUrl] = useState("");
@@ -255,7 +485,9 @@ export default function AdminPage() {
       fetch("/api/contact").then((r) => r.json()),
     ]);
     setReviews(rv);
-    const withPins = await fetch("/api/admin/galleries").then((r) => r.json()).catch(() => gv);
+    const withPins = await fetch("/api/admin/galleries")
+      .then((r) => r.json())
+      .catch(() => gv);
     setGalleries(withPins);
     setInquiries(iq);
   }, []);
@@ -313,7 +545,12 @@ export default function AdminPage() {
     const res = await fetch("/api/galleries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle, url: newUrl, pin: newPin, gallery_password: newGalleryPassword }),
+      body: JSON.stringify({
+        title: newTitle,
+        url: newUrl,
+        pin: newPin,
+        gallery_password: newGalleryPassword,
+      }),
     });
     if (res.ok) {
       const gallery = await res.json();
@@ -326,8 +563,33 @@ export default function AdminPage() {
     setAdding(false);
   };
 
+  const deleteInquiry = async (id: string) => {
+    await fetch(`/api/contact/${id}`, { method: "DELETE" });
+    setInquiries((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const updateInquiry = (id: string, updated: Partial<Inquiry>) => {
+    setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, ...updated } : i)));
+  };
+
+  // Derived counts
+  const counts = {
+    all: inquiries.length,
+    pending: inquiries.filter((i) => i.status === "pending").length,
+    confirmed: inquiries.filter((i) => i.status === "confirmed").length,
+    completed: inquiries.filter((i) => i.status === "completed").length,
+    cancelled: inquiries.filter((i) => i.status === "cancelled").length,
+  };
+
+  const filteredInquiries =
+    statusFilter === "all" ? inquiries : inquiries.filter((i) => i.status === statusFilter);
+
   if (authed === null) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-white/20 text-sm font-mono">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white/20 text-sm font-mono">
+        Loading...
+      </div>
+    );
   }
 
   if (!authed) {
@@ -368,7 +630,81 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Galleries */}
+        {/* ── Bookings ───────────────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold">Bookings</h2>
+            {counts.pending > 0 && (
+              <span className="text-[11px] font-mono text-amber-400/70 bg-amber-400/[0.08] border border-amber-400/20 px-2 py-0.5 rounded-full">
+                {counts.pending} pending
+              </span>
+            )}
+          </div>
+
+          {/* Stats */}
+          {inquiries.length > 0 && (
+            <div className="grid grid-cols-4 gap-3 mb-6">
+              {(["pending", "confirmed", "completed", "cancelled"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    statusFilter === s
+                      ? "border-white/20 bg-white/[0.05]"
+                      : "border-white/[0.05] bg-white/[0.01] hover:border-white/[0.1]"
+                  }`}
+                >
+                  <div className="text-xl font-bold font-mono text-white tabular-nums">
+                    {counts[s]}
+                  </div>
+                  <div className={`text-[10px] font-mono mt-0.5 ${STATUS_CONFIG[s].badge.split(" ")[0]}`}>
+                    {STATUS_CONFIG[s].label}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Filter tabs */}
+          {inquiries.length > 0 && (
+            <div className="flex items-center gap-1 mb-5 p-1 rounded-xl border border-white/[0.06] bg-white/[0.01] w-fit">
+              {(["all", "pending", "confirmed", "completed", "cancelled"] as StatusFilter[]).map(
+                (f) => (
+                  <button
+                    key={f}
+                    onClick={() => setStatusFilter(f)}
+                    className={`px-3 py-1.5 rounded-lg text-[11px] font-mono transition-all ${
+                      statusFilter === f
+                        ? "bg-white/[0.08] text-white"
+                        : "text-white/30 hover:text-white/60"
+                    }`}
+                  >
+                    {f === "all" ? `All (${counts.all})` : STATUS_CONFIG[f].label}
+                  </button>
+                )
+              )}
+            </div>
+          )}
+
+          {/* Cards */}
+          <div className="space-y-3">
+            {filteredInquiries.length === 0 && (
+              <p className="text-white/20 text-sm font-mono">
+                {inquiries.length === 0 ? "No bookings yet." : "No bookings in this category."}
+              </p>
+            )}
+            {filteredInquiries.map((inq) => (
+              <BookingCard
+                key={inq.id}
+                inquiry={inq}
+                onDelete={deleteInquiry}
+                onUpdate={updateInquiry}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* ── Galleries ──────────────────────────────────────────────────── */}
         <section>
           <h2 className="text-lg font-semibold mb-6">Galleries</h2>
 
@@ -418,42 +754,14 @@ export default function AdminPage() {
                 gallery={g}
                 onDelete={deleteGallery}
                 onUpdate={(id, updated) =>
-                  setGalleries((prev) =>
-                    prev.map((x) => (x.id === id ? { ...x, ...updated } : x))
-                  )
+                  setGalleries((prev) => prev.map((x) => (x.id === id ? { ...x, ...updated } : x)))
                 }
               />
             ))}
           </div>
         </section>
 
-        {/* Inquiries */}
-        <section>
-          <h2 className="text-lg font-semibold mb-6">Booking Inquiries</h2>
-          <div className="space-y-3">
-            {inquiries.length === 0 && (
-              <p className="text-white/20 text-sm font-mono">No inquiries yet.</p>
-            )}
-            {inquiries.map((inq) => (
-              <div
-                key={inq.id}
-                className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-1"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">{inq.name}</span>
-                  <span className="text-xs font-mono text-white/25">
-                    {new Date(inq.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </span>
-                </div>
-                <p className="text-xs font-mono text-white/40">{inq.email}</p>
-                <p className="text-xs font-mono text-white/30">{inq.session_type}{inq.preferred_date ? ` · ${inq.preferred_date}` : ""}</p>
-                {inq.message && <p className="text-xs text-white/40 leading-relaxed pt-1">{inq.message}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Reviews */}
+        {/* ── Reviews ────────────────────────────────────────────────────── */}
         <section>
           <h2 className="text-lg font-semibold mb-6">Reviews</h2>
           <div className="space-y-3">
@@ -461,12 +769,7 @@ export default function AdminPage() {
               <p className="text-white/20 text-sm font-mono">No reviews yet.</p>
             )}
             {reviews.map((r) => (
-              <ReviewRow
-                key={r.id}
-                review={r}
-                onDelete={deleteReview}
-                onUpdate={updateReview}
-              />
+              <ReviewRow key={r.id} review={r} onDelete={deleteReview} onUpdate={updateReview} />
             ))}
           </div>
         </section>

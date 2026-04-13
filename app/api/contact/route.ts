@@ -1,6 +1,11 @@
 import { neon } from "@neondatabase/serverless";
+import { Resend } from "resend";
 
 const sql = neon(process.env.DATABASE_URL!);
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 async function ensureTable() {
   await sql`
@@ -11,9 +16,13 @@ async function ensureTable() {
       session_type VARCHAR(100) NOT NULL,
       preferred_date VARCHAR(200),
       message TEXT,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      admin_notes TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'pending'`;
+  await sql`ALTER TABLE contact_inquiries ADD COLUMN IF NOT EXISTS admin_notes TEXT`;
 }
 
 export async function GET() {
@@ -40,6 +49,21 @@ export async function POST(request: Request) {
     INSERT INTO contact_inquiries (name, email, session_type, preferred_date, message)
     VALUES (${name}, ${email}, ${sessionType}, ${preferredDate}, ${message})
   `;
+
+  await getResend().emails.send({
+    from: "Booking <noreply@kabirj.com>",
+    to: "mail@kabirj.com",
+    subject: `New booking inquiry from ${name}`,
+    text: [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Session type: ${sessionType}`,
+      preferredDate ? `Preferred date: ${preferredDate}` : null,
+      message ? `Message: ${message}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  });
 
   return Response.json({ ok: true }, { status: 201 });
 }
