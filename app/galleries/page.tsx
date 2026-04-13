@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EASE } from "@/lib/easing";
 import Navbar from "@/components/Navbar";
-import Cursor from "@/components/Cursor";
 
 interface Gallery {
   id: string;
@@ -149,7 +148,6 @@ export default function GalleriesPage() {
 
   return (
     <>
-      <Cursor />
       <main className="bg-black min-h-screen">
         <Navbar />
         <div className="max-w-6xl mx-auto px-6 pt-40 pb-32">
