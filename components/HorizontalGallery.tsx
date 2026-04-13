@@ -8,6 +8,7 @@ import {
   useSpring,
   AnimatePresence,
   useInView,
+  animate,
 } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
@@ -33,18 +34,18 @@ export default function HorizontalGallery() {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const lightboxTouchStartX = useRef(0);
+  const scrollEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inView = useInView(headerRef, { once: true });
 
-  // Driven by horizontal scroll / swipe — not tied to vertical scroll
-  const trackXMV = useMotionValue(0);
-  const x = useSpring(trackXMV, { stiffness: 80, damping: 22, mass: 0.6, restDelta: 0.5 });
+  // Direct motion value — no spring lag on input, OS handles trackpad momentum
+  const x = useMotionValue(0);
 
-  // Progress bar follows the spring output so it lags naturally
+  // Progress bar gets a gentle spring so it doesn't snap
   const progressRaw = useTransform(x, (val) =>
     overflowRef.current > 0 ? Math.max(0, Math.min(1, -val / overflowRef.current)) : 0
   );
-  const progressScaleX = useSpring(progressRaw, { stiffness: 80, damping: 22, mass: 0.6 });
+  const progressScaleX = useSpring(progressRaw, { stiffness: 120, damping: 30 });
 
   useEffect(() => {
     const measure = () => {
@@ -53,14 +54,13 @@ export default function HorizontalGallery() {
       const ww = window.innerWidth;
       const ov = Math.max(0, tw - ww);
       overflowRef.current = ov;
-      // Clamp current position in case viewport shrank
-      const clamped = Math.max(-ov, Math.min(0, trackXMV.get()));
-      trackXMV.set(clamped);
+      const clamped = Math.max(-ov, Math.min(0, x.get()));
+      x.set(clamped);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [trackXMV]);
+  }, [x]);
 
   // Intercept horizontal wheel; let vertical scroll pass through untouched
   const handleWheel = useCallback(
@@ -70,12 +70,23 @@ export default function HorizontalGallery() {
 
       if (absX > absY && absX > 3) {
         e.preventDefault();
-        const next = Math.max(-overflowRef.current, Math.min(0, trackXMV.get() - e.deltaX));
-        trackXMV.set(next);
+
+        // Cancel any running inertia animation and apply delta directly
+        if (scrollEndTimer.current) clearTimeout(scrollEndTimer.current);
+        x.stop();
+
+        const next = Math.max(-overflowRef.current, Math.min(0, x.get() - e.deltaX));
+        x.set(next);
+
+        // After wheel events stop, add a brief settling snap to avoid sub-pixel fuzz
+        scrollEndTimer.current = setTimeout(() => {
+          const cur = x.get();
+          const snapped = Math.max(-overflowRef.current, Math.min(0, cur));
+          if (cur !== snapped) x.set(snapped);
+        }, 80);
       }
-      // Vertical scroll is not prevented — page keeps scrolling
     },
-    [trackXMV]
+    [x]
   );
 
   useEffect(() => {
@@ -108,10 +119,10 @@ export default function HorizontalGallery() {
 
       if (locked === "x") {
         e.preventDefault();
-        const next = Math.max(-overflowRef.current, Math.min(0, trackXMV.get() - dx));
+        const next = Math.max(-overflowRef.current, Math.min(0, x.get() - dx));
         touchStartX.current = e.touches[0].clientX;
         touchStartY.current = e.touches[0].clientY;
-        trackXMV.set(next);
+        x.set(next);
       }
     };
 
@@ -121,7 +132,7 @@ export default function HorizontalGallery() {
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);
     };
-  }, [trackXMV]);
+  }, [x]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
