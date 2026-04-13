@@ -5,6 +5,7 @@ import {
   motion,
   useScroll,
   useTransform,
+  useSpring,
   AnimatePresence,
   useInView,
 } from "framer-motion";
@@ -12,69 +13,15 @@ import Image from "next/image";
 import { EASE } from "@/lib/easing";
 
 const photos = [
-  {
-    id: 1,
-    src: "/photos/20251004-DSC01534.jpg",
-    alt: "Cross country race start",
-    category: "Cross Country",
-    ratio: 4 / 3,
-  },
-  {
-    id: 2,
-    src: "/photos/finals-11.JPG",
-    alt: "Payton athlete celebrates at finish",
-    category: "Track & Field",
-    ratio: 3 / 4,
-  },
-  {
-    id: 3,
-    src: "/photos/20251108-DSC03049.jpg",
-    alt: "Cross country race in autumn",
-    category: "Cross Country",
-    ratio: 3 / 2,
-  },
-  {
-    id: 4,
-    src: "/photos/finals-19.JPG",
-    alt: "Peoria Christian athlete",
-    category: "Track & Field",
-    ratio: 4 / 3,
-  },
-  {
-    id: 5,
-    src: "/photos/finals-12.JPG",
-    alt: "Payton athletes look to the sky",
-    category: "Track & Field",
-    ratio: 3 / 4,
-  },
-  {
-    id: 6,
-    src: "/photos/20251010-DSC02484.jpg",
-    alt: "Athlete celebrates with teammates",
-    category: "Cross Country",
-    ratio: 4 / 3,
-  },
-  {
-    id: 7,
-    src: "/photos/IMG_3786.JPG",
-    alt: "Elite marathon runner",
-    category: "Road Racing",
-    ratio: 4 / 5,
-  },
-  {
-    id: 8,
-    src: "/photos/finals-20.JPG",
-    alt: "Athletes embrace after race",
-    category: "Track & Field",
-    ratio: 3 / 4,
-  },
-  {
-    id: 9,
-    src: "/photos/20251108-DSC03732.jpg",
-    alt: "Cross country finish celebration",
-    category: "Cross Country",
-    ratio: 4 / 3,
-  },
+  { id: 1, src: "/photos/20251004-DSC01534.jpg", alt: "Cross country race start", category: "Cross Country", ratio: 4 / 3 },
+  { id: 2, src: "/photos/finals-11.JPG", alt: "Payton athlete celebrates at finish", category: "Track & Field", ratio: 3 / 4 },
+  { id: 3, src: "/photos/20251108-DSC03049.jpg", alt: "Cross country race in autumn", category: "Cross Country", ratio: 3 / 2 },
+  { id: 4, src: "/photos/finals-19.JPG", alt: "Peoria Christian athlete", category: "Track & Field", ratio: 4 / 3 },
+  { id: 5, src: "/photos/finals-12.JPG", alt: "Payton athletes look to the sky", category: "Track & Field", ratio: 3 / 4 },
+  { id: 6, src: "/photos/20251010-DSC02484.jpg", alt: "Athlete celebrates with teammates", category: "Cross Country", ratio: 4 / 3 },
+  { id: 7, src: "/photos/IMG_3786.JPG", alt: "Elite marathon runner", category: "Road Racing", ratio: 4 / 5 },
+  { id: 8, src: "/photos/finals-20.JPG", alt: "Athletes embrace after race", category: "Track & Field", ratio: 3 / 4 },
+  { id: 9, src: "/photos/20251108-DSC03732.jpg", alt: "Cross country finish celebration", category: "Cross Country", ratio: 4 / 3 },
 ];
 
 export default function HorizontalGallery() {
@@ -93,8 +40,20 @@ export default function HorizontalGallery() {
     offset: ["start start", "end end"],
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], [0, -overflow]);
-  const progressScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  // Ease-in/out at the start and end so it doesn't jerk
+  const rawX = useTransform(
+    scrollYProgress,
+    [0, 0.04, 0.96, 1],
+    [0, 0, -overflow, -overflow]
+  );
+
+  // Spring adds inertia — feels like the track has weight
+  const x = useSpring(rawX, { stiffness: 80, damping: 22, mass: 0.6, restDelta: 0.5 });
+
+  const progressScaleX = useSpring(
+    useTransform(scrollYProgress, [0, 1], [0, 1]),
+    { stiffness: 80, damping: 22, mass: 0.6 }
+  );
 
   useEffect(() => {
     const measure = () => {
@@ -104,23 +63,26 @@ export default function HorizontalGallery() {
       const wh = window.innerHeight;
       const ov = Math.max(0, tw - ww);
       setOverflow(ov);
-      setContainerHeight(`${ov + wh}px`);
+      // Extra vh so last photo fully rests before scroll resumes
+      setContainerHeight(`${ov + wh * 1.4}px`);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
 
-  // ESC to close lightbox
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSelectedPhoto(null);
+      if (selectedPhoto !== null) {
+        if (e.key === "ArrowRight") setSelectedPhoto((p) => p !== null ? (p + 1) % photos.length : null);
+        if (e.key === "ArrowLeft") setSelectedPhoto((p) => p !== null ? (p - 1 + photos.length) % photos.length : null);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [selectedPhoto]);
 
-  // Lock body scroll when lightbox open
   useEffect(() => {
     document.body.style.overflow = selectedPhoto !== null ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -149,55 +111,77 @@ export default function HorizontalGallery() {
             >
               01 / Gallery
             </motion.span>
-            <motion.span
+
+            {/* Animated scroll hint */}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="text-xs font-mono text-white/20 tracking-widest uppercase"
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex items-center gap-2 text-xs font-mono text-white/20 tracking-widest uppercase"
             >
-              scroll →
-            </motion.span>
+              scroll
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+              >
+                →
+              </motion.span>
+            </motion.div>
           </div>
 
           {/* Track */}
           <div className="flex-1 flex items-center overflow-hidden">
             <motion.div
               ref={trackRef}
-              className="flex gap-4 pl-[10vw]"
+              className="flex gap-5 pl-[10vw]"
               style={{ x }}
             >
               {photos.map((photo, i) => (
                 <motion.div
                   key={photo.id}
-                  className="shrink-0 relative overflow-hidden rounded-xl"
+                  className="shrink-0 relative overflow-hidden rounded-2xl group cursor-pointer"
                   style={{
                     height: "62vh",
                     width: `calc(62vh * ${photo.ratio})`,
                   }}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.7, delay: 0.1 + i * 0.06, ease: EASE }}
-                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.8, delay: 0.05 + i * 0.07, ease: EASE }}
                   onClick={() => setSelectedPhoto(i)}
-
                 >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover transition-transform duration-500"
-                    sizes="60vw"
-                  />
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/15 transition-colors duration-300" />
-                  <div className="absolute bottom-3 left-3 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-xs font-mono text-white/60 tracking-widest uppercase">
+                  {/* Image scales on hover, not the card */}
+                  <motion.div
+                    className="absolute inset-0"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.5, ease: EASE }}
+                  >
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      fill
+                      className="object-cover"
+                      sizes="60vw"
+                    />
+                  </motion.div>
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400" />
+
+                  {/* Category label */}
+                  <motion.div
+                    className="absolute bottom-4 left-4"
+                    initial={{ opacity: 0, y: 6 }}
+                    whileHover={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
                       {photo.category}
                     </span>
-                  </div>
+                  </motion.div>
                 </motion.div>
               ))}
               {/* Trailing spacer */}
-              <div className="shrink-0 w-[8vw]" />
+              <div className="shrink-0 w-[10vw]" />
             </motion.div>
           </div>
 
@@ -205,7 +189,7 @@ export default function HorizontalGallery() {
           <div className="flex items-center gap-6 mx-10 mb-8 shrink-0">
             <div className="h-px flex-1 bg-white/[0.06]">
               <motion.div
-                className="h-full bg-white/30 origin-left"
+                className="h-full bg-white/25 origin-left"
                 style={{ scaleX: progressScaleX }}
               />
             </div>
@@ -238,7 +222,7 @@ export default function HorizontalGallery() {
               onClick={() => setSelectedPhoto(i)}
             >
               <div
-                className="relative overflow-hidden rounded-lg"
+                className="relative overflow-hidden rounded-xl"
                 style={{ aspectRatio: photo.ratio }}
               >
                 <Image
@@ -279,9 +263,7 @@ export default function HorizontalGallery() {
                 e.stopPropagation();
                 setSelectedPhoto((p) =>
                   p !== null
-                    ? delta > 0
-                      ? (p + 1) % photos.length
-                      : (p - 1 + photos.length) % photos.length
+                    ? delta > 0 ? (p + 1) % photos.length : (p - 1 + photos.length) % photos.length
                     : null
                 );
               }
@@ -307,39 +289,21 @@ export default function HorizontalGallery() {
               </p>
             </motion.div>
 
-            {/* Nav arrows */}
             <button
               aria-label="Previous photo"
               className="absolute left-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedPhoto((p) =>
-                  p !== null ? (p - 1 + photos.length) % photos.length : null
-                );
-              }}
-            >
-              ←
-            </button>
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto((p) => p !== null ? (p - 1 + photos.length) % photos.length : null); }}
+            >←</button>
             <button
               aria-label="Next photo"
               className="absolute right-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedPhoto((p) =>
-                  p !== null ? (p + 1) % photos.length : null
-                );
-              }}
-            >
-              →
-            </button>
-
+              onClick={(e) => { e.stopPropagation(); setSelectedPhoto((p) => p !== null ? (p + 1) % photos.length : null); }}
+            >→</button>
             <button
               aria-label="Close lightbox"
               className="absolute top-6 right-6 text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase transition-colors"
               onClick={() => setSelectedPhoto(null)}
-            >
-              ESC
-            </button>
+            >ESC</button>
           </motion.div>
         )}
       </AnimatePresence>
