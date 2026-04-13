@@ -7,6 +7,7 @@ interface Review {
   name: string;
   rating: number;
   body: string;
+  event: string | null;
   createdAt: string;
 }
 
@@ -130,6 +131,108 @@ function GalleryRow({
   );
 }
 
+function ReviewRow({
+  review,
+  onDelete,
+  onUpdate,
+}: {
+  review: Review;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, updated: Partial<Review>) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(review.name);
+  const [body, setBody] = useState(review.body);
+  const [event, setEvent] = useState(review.event ?? "");
+  const [rating, setRating] = useState(review.rating);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    const res = await fetch(`/api/reviews/${review.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, body, rating, event }),
+    });
+    if (res.ok) {
+      onUpdate(review.id, { name, body, rating, event: event || null });
+      setEditing(false);
+    }
+    setSaving(false);
+  };
+
+  const cancel = () => {
+    setName(review.name);
+    setBody(review.body);
+    setEvent(review.event ?? "");
+    setRating(review.rating);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="p-4 rounded-xl border border-white/[0.12] bg-white/[0.03] space-y-3">
+        <div className="grid sm:grid-cols-2 gap-3">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className={inputClass} />
+          <input value={event} onChange={(e) => setEvent(e.target.value)} placeholder="Event (optional)" className={inputClass} />
+        </div>
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Review" rows={3} className={`${inputClass} resize-none`} />
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono text-white/25 tracking-widest uppercase">Rating</span>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                className={`text-lg leading-none transition-colors ${star <= rating ? "text-white" : "text-white/15"}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={save}
+            disabled={saving || !name || !body}
+            className="px-4 py-2 rounded-lg bg-white text-black text-xs font-medium hover:bg-white/90 transition-colors disabled:opacity-40"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            onClick={cancel}
+            className="px-4 py-2 rounded-lg border border-white/10 text-white/40 text-xs hover:text-white/70 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start justify-between p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-3 mb-1">
+          <span className="text-sm font-medium text-white">{review.name}</span>
+          <span className="text-xs font-mono text-white/30">{"★".repeat(review.rating)}</span>
+          {review.event && <span className="text-xs font-mono text-white/25">{review.event}</span>}
+        </div>
+        <p className="text-xs text-white/40 leading-relaxed">{review.body}</p>
+      </div>
+      <div className="flex items-center gap-4 ml-4 shrink-0">
+        <button onClick={() => setEditing(true)} className="text-xs font-mono text-white/30 hover:text-white/60 transition-colors">
+          Edit
+        </button>
+        <button onClick={() => onDelete(review.id)} className="text-xs font-mono text-red-400/50 hover:text-red-400 transition-colors">
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [password, setPassword] = useState("");
@@ -193,6 +296,10 @@ export default function AdminPage() {
   const deleteReview = async (id: string) => {
     await fetch(`/api/reviews/${id}`, { method: "DELETE" });
     setReviews((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const updateReview = (id: string, updated: Partial<Review>) => {
+    setReviews((prev) => prev.map((r) => (r.id === id ? { ...r, ...updated } : r)));
   };
 
   const deleteGallery = async (id: string) => {
@@ -354,24 +461,12 @@ export default function AdminPage() {
               <p className="text-white/20 text-sm font-mono">No reviews yet.</p>
             )}
             {reviews.map((r) => (
-              <div
+              <ReviewRow
                 key={r.id}
-                className="flex items-start justify-between p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]"
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-sm font-medium text-white">{r.name}</span>
-                    <span className="text-xs font-mono text-white/30">{"★".repeat(r.rating)}</span>
-                  </div>
-                  <p className="text-xs text-white/40 leading-relaxed">{r.body}</p>
-                </div>
-                <button
-                  onClick={() => deleteReview(r.id)}
-                  className="text-xs font-mono text-red-400/50 hover:text-red-400 transition-colors ml-4 shrink-0"
-                >
-                  Delete
-                </button>
-              </div>
+                review={r}
+                onDelete={deleteReview}
+                onUpdate={updateReview}
+              />
             ))}
           </div>
         </section>
