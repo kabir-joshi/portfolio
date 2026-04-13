@@ -71,7 +71,7 @@ export default function Services() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
               whileHover={{ y: -4 }}
-              className="group relative p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default"
+              className="group relative flex flex-col p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default"
             >
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/20">{service.number}</span>
@@ -80,7 +80,7 @@ export default function Services() {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {service.title}
               </h3>
-              <p className="text-[#86868b] text-sm leading-relaxed mb-6">
+              <p className="text-[#86868b] text-sm leading-relaxed mb-6 flex-1">
                 {service.description}
               </p>
 
