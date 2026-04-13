@@ -7,6 +7,7 @@ interface Review {
   name: string;
   rating: number;
   body: string;
+  event: string | null;
   createdAt: string;
 }
 
@@ -20,6 +21,7 @@ async function ensureTable() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`ALTER TABLE reviews ADD COLUMN IF NOT EXISTS event VARCHAR(200)`;
 }
 
 export async function GET() {
@@ -30,6 +32,7 @@ export async function GET() {
     name: r.name as string,
     rating: r.rating as number,
     body: r.body as string,
+    event: r.event as string | null,
     createdAt: r.created_at as string,
   }));
   return Response.json(reviews);
@@ -40,6 +43,7 @@ export async function POST(request: Request) {
 
   const name = (body.name ?? "").trim().slice(0, 100);
   const reviewBody = (body.body ?? "").trim().slice(0, 1000);
+  const event = (body.event ?? "").trim().slice(0, 200) || null;
   const rating = Number(body.rating);
 
   if (!name || !reviewBody || !Number.isInteger(rating) || rating < 1 || rating > 5) {
@@ -48,9 +52,9 @@ export async function POST(request: Request) {
 
   await ensureTable();
   const rows = await sql`
-    INSERT INTO reviews (name, rating, body)
-    VALUES (${name}, ${rating}, ${reviewBody})
-    RETURNING id, name, rating, body, created_at
+    INSERT INTO reviews (name, rating, body, event)
+    VALUES (${name}, ${rating}, ${reviewBody}, ${event})
+    RETURNING id, name, rating, body, event, created_at
   `;
   const row = rows[0];
   const review: Review = {
@@ -58,6 +62,7 @@ export async function POST(request: Request) {
     name: row.name as string,
     rating: row.rating as number,
     body: row.body as string,
+    event: row.event as string | null,
     createdAt: row.created_at as string,
   };
   return Response.json(review, { status: 201 });

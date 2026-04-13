@@ -1,9 +1,10 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
+import { useEffect, useRef, useState } from "react";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -15,11 +16,78 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } },
 };
 
+const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+function useScramble(text: string, active: boolean) {
+  const [output, setOutput] = useState(text);
+  useEffect(() => {
+    if (!active) return;
+    let frame = 0;
+    const total = 28;
+    const id = setInterval(() => {
+      setOutput(
+        text.split("").map((char, i) => {
+          if (char === " ") return " ";
+          if (frame >= (i / text.length) * total + 5) return char;
+          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }).join("")
+      );
+      frame++;
+      if (frame > total + 6) clearInterval(id);
+    }, 32);
+    return () => clearInterval(id);
+  }, [active, text]);
+  return output;
+}
+
+function MagneticButton({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 16 });
+  const sy = useSpring(y, { stiffness: 220, damping: 16 });
+
+  const onMove = (e: React.MouseEvent) => {
+    const rect = ref.current!.getBoundingClientRect();
+    x.set((e.clientX - (rect.left + rect.width / 2)) * 0.32);
+    y.set((e.clientY - (rect.top + rect.height / 2)) * 0.32);
+  };
+  const onLeave = () => { x.set(0); y.set(0); };
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      style={{ x: sx, y: sy }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      className={className}
+    >
+      {children}
+    </motion.a>
+  );
+}
+
 export default function Hero() {
   const { scrollY } = useScroll();
   const imageScale = useTransform(scrollY, [0, 700], [1, 1.1]);
   const textOpacity = useTransform(scrollY, [0, 350], [1, 0]);
   const textY = useTransform(scrollY, [0, 350], [0, -50]);
+
+  const [scrambleActive, setScrambleActive] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setScrambleActive(true), 480);
+    return () => clearTimeout(t);
+  }, []);
+  const heroName = useScramble("Kabir Joshi", scrambleActive);
 
   return (
     <section className="relative h-screen overflow-hidden">
@@ -54,9 +122,9 @@ export default function Hero() {
 
         <motion.h1
           variants={itemVariants}
-          className="text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-none mb-4 text-white"
+          className="text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-none mb-4 text-white font-mono"
         >
-          Kabir Joshi
+          {heroName}
         </motion.h1>
 
         <motion.p
@@ -77,18 +145,18 @@ export default function Hero() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row items-center justify-center gap-3"
         >
-          <a
+          <MagneticButton
             href="#gallery"
             className="px-8 py-3.5 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200"
           >
             View gallery
-          </a>
-          <a
+          </MagneticButton>
+          <MagneticButton
             href="#booking"
             className="px-8 py-3.5 rounded-full border border-white/30 text-white text-sm font-medium hover:border-white/60 transition-colors duration-200"
           >
             Book a session
-          </a>
+          </MagneticButton>
         </motion.div>
       </motion.div>
 

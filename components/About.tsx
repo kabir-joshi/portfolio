@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
 
@@ -29,11 +29,43 @@ function RevealLine({
   );
 }
 
+function useCounter(target: number, inView: boolean, duration = 1400) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    let startTime: number | null = null;
+    const tick = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+      else setCount(target);
+    };
+    const id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [inView, target, duration]);
+  return count;
+}
+
 const stats = [
-  { value: "50+", label: "shoots covered" },
-  { value: "200+", label: "athletes photographed" },
-  { value: "100+", label: "events documented" },
+  { target: 50, suffix: "+", label: "shoots covered" },
+  { target: 200, suffix: "+", label: "athletes photographed" },
+  { target: 100, suffix: "+", label: "events documented" },
 ];
+
+function StatCounter({ target, suffix, label, inView }: { target: number; suffix: string; label: string; inView: boolean }) {
+  const count = useCounter(target, inView);
+  return (
+    <div>
+      <div className="text-2xl font-bold text-white mb-1 font-mono tabular-nums">
+        {count}{suffix}
+      </div>
+      <div className="text-xs text-[#86868b] font-mono leading-snug">{label}</div>
+    </div>
+  );
+}
 
 export default function About() {
   const ref = useRef<HTMLDivElement>(null);
@@ -59,13 +91,14 @@ export default function About() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Photo placeholder */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.15, ease: EASE }}
-          >
-            <div className="aspect-[3/4] rounded-2xl relative overflow-hidden">
+          {/* Photo with slide-up reveal */}
+          <div className="aspect-[3/4] rounded-2xl overflow-hidden relative">
+            <motion.div
+              className="absolute inset-0"
+              initial={{ y: "100%" }}
+              animate={inView ? { y: "0%" } : {}}
+              transition={{ duration: 1.1, delay: 0.1, ease: EASE }}
+            >
               <Image
                 src="/photos/finals-11.JPG"
                 alt="Athlete celebrates at the finish line"
@@ -74,12 +107,11 @@ export default function About() {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
           {/* Text */}
           <div ref={bodyRef} className="flex flex-col justify-center">
-            {/* Heading with line reveals */}
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8 leading-tight">
               <RevealLine delay={0.05} inView={bodyInView}>
                 I shoot what
@@ -89,7 +121,6 @@ export default function About() {
               </RevealLine>
             </h2>
 
-            {/* Body text with line reveals */}
             <div className="space-y-5 text-[#86868b] leading-relaxed mb-12">
               <RevealLine delay={0.25} inView={bodyInView}>
                 I specialize in track & field, cross country, and road racing —
@@ -103,7 +134,7 @@ export default function About() {
               </RevealLine>
             </div>
 
-            {/* Stats */}
+            {/* Animated stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={bodyInView ? { opacity: 1, y: 0 } : {}}
@@ -111,14 +142,7 @@ export default function About() {
               className="grid grid-cols-3 gap-4 pt-8 border-t border-white/[0.06]"
             >
               {stats.map((stat) => (
-                <div key={stat.label}>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-[#86868b] font-mono leading-snug">
-                    {stat.label}
-                  </div>
-                </div>
+                <StatCounter key={stat.label} {...stat} inView={bodyInView} />
               ))}
             </motion.div>
           </div>

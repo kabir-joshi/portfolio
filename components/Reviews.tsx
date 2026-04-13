@@ -9,6 +9,7 @@ interface Review {
   name: string;
   rating: number;
   body: string;
+  event: string | null;
   createdAt: string;
 }
 
@@ -75,7 +76,12 @@ function ReviewCard({
         <span className="text-xs font-mono text-white/20">{date}</span>
       </div>
       <p className="text-white/60 text-sm leading-relaxed mb-4">&ldquo;{review.body}&rdquo;</p>
-      <span className="text-xs font-mono text-white/30">— {review.name}</span>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-mono text-white/30">— {review.name}</span>
+        {review.event && (
+          <span className="text-xs font-mono text-white/20 truncate">{review.event}</span>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -86,6 +92,7 @@ export default function Reviews() {
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [name, setName] = useState("");
+  const [event, setEvent] = useState("");
   const [rating, setRating] = useState(0);
   const [body, setBody] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">("idle");
@@ -107,12 +114,13 @@ export default function Reviews() {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, rating, body }),
+        body: JSON.stringify({ name, rating, body, event }),
       });
       if (!res.ok) throw new Error();
       const newReview: Review = await res.json();
       setReviews((prev) => [newReview, ...prev]);
       setName("");
+      setEvent("");
       setRating(0);
       setBody("");
       setStatus("done");
@@ -185,6 +193,19 @@ export default function Reviews() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+                Event <span className="normal-case text-white/15">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={event}
+                onChange={(e) => setEvent(e.target.value)}
+                placeholder="e.g. IHSA State XC, Oct 2025"
                 className={inputClass}
               />
             </div>
