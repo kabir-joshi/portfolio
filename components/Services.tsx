@@ -102,13 +102,13 @@ export default function Services() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-16"
         >
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             04 / Services
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </motion.div>
 
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12">
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white light:text-black mb-12">
           <SplitText text="What I offer" inView={inView} />
         </h2>
 
@@ -121,15 +121,15 @@ export default function Services() {
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
               className="h-full"
             >
-            <TiltCard className="group relative flex flex-col h-full p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default">
+            <TiltCard className="group relative flex flex-col h-full p-8 rounded-2xl border border-white/[0.06] light:border-black/[0.06] bg-white/[0.02] light:bg-black/[0.02] hover:bg-white/[0.04] light:hover:bg-black/[0.04] hover:border-white/[0.12] light:hover:border-black/[0.12] transition-all duration-300 cursor-default">
               <div className="flex items-center justify-between mb-6">
-                <span className="text-xs font-mono text-white/20">{service.number}</span>
-                <span className="text-xs font-mono text-white/40">{service.price}</span>
+                <span className="text-xs font-mono text-white/20 light:text-black/20">{service.number}</span>
+                <span className="text-xs font-mono text-white/40 light:text-black/40">{service.price}</span>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">
+              <h3 className="text-2xl font-bold text-white light:text-black mb-3">
                 {service.title}
               </h3>
-              <p className="text-[#86868b] text-sm leading-relaxed mb-6">
+              <p className="text-[#86868b] light:text-[#5a5a5a] text-sm leading-relaxed mb-6">
                 {service.description}
               </p>
 
@@ -137,9 +137,9 @@ export default function Services() {
                 {service.details.map((detail) => (
                   <li
                     key={detail}
-                    className="flex items-center gap-2 text-xs text-white/30 font-mono"
+                    className="flex items-center gap-2 text-xs text-white/30 light:text-black/30 font-mono"
                   >
-                    <span className="w-px h-3 bg-white/20 shrink-0" />
+                    <span className="w-px h-3 bg-white/20 light:bg-black/20 shrink-0" />
                     {detail}
                   </li>
                 ))}
@@ -147,7 +147,7 @@ export default function Services() {
 
               <a
                 href="#booking"
-                className="inline-flex items-center gap-2 text-sm text-white/40 group-hover:text-white/70 transition-colors duration-200"
+                className="inline-flex items-center gap-2 text-sm text-white/40 light:text-black/40 group-hover:text-white/70 light:group-hover:text-black/70 transition-colors duration-200"
               >
                 {service.cta}
                 <span className="transform group-hover:translate-x-1 transition-transform duration-200">

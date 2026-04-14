@@ -36,7 +36,7 @@ export default function Process() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-32 px-6 border-t border-white/[0.04]">
+    <section className="py-32 px-6 border-t border-white/[0.04] light:border-black/[0.04]">
       <div className="max-w-6xl mx-auto">
         <motion.div
           ref={ref}
@@ -45,35 +45,35 @@ export default function Process() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-16"
         >
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             03 / How it works
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </motion.div>
 
         {/* Animated connecting line */}
-        <div className="hidden md:block h-px mb-8 bg-white/[0.04] overflow-hidden relative">
+        <div className="hidden md:block h-px mb-8 bg-white/[0.04] light:bg-black/[0.04] overflow-hidden relative">
           <motion.div
-            className="absolute inset-0 bg-white/25 origin-left"
+            className="absolute inset-0 bg-white/25 light:bg-black/25 origin-left"
             initial={{ scaleX: 0 }}
             animate={inView ? { scaleX: 1 } : {}}
             transition={{ duration: 1.4, delay: 0.1, ease: EASE }}
           />
         </div>
 
-        <div className="grid md:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden">
+        <div className="grid md:grid-cols-4 gap-px bg-white/[0.04] light:bg-black/[0.04] rounded-2xl overflow-hidden">
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: i * 0.1, ease: EASE }}
-              className="bg-black p-8 flex flex-col gap-6"
+              className="bg-black light:bg-[#f5f0eb] p-8 flex flex-col gap-6"
             >
-              <span className="text-xs font-mono text-white/15">{step.number}</span>
+              <span className="text-xs font-mono text-white/15 light:text-black/15">{step.number}</span>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">{step.title}</h3>
-                <p className="text-sm text-white/40 leading-relaxed">{step.description}</p>
+                <h3 className="text-lg font-semibold text-white light:text-black mb-3">{step.title}</h3>
+                <p className="text-sm text-white/40 light:text-black/40 leading-relaxed">{step.description}</p>
               </div>
             </motion.div>
           ))}

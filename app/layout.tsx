@@ -61,12 +61,12 @@ export default function RootLayout({
         <div
           aria-hidden
           className="ambient-glow-a pointer-events-none fixed top-[-200px] left-[-200px] w-[700px] h-[700px] z-0"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.045) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, var(--c-glow-a) 0%, transparent 70%)" }}
         />
         <div
           aria-hidden
           className="ambient-glow-b pointer-events-none fixed bottom-[-200px] right-[-200px] w-[600px] h-[600px] z-0"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, var(--c-glow-b) 0%, transparent 70%)" }}
         />
 
         {children}

@@ -33,7 +33,7 @@ interface Review {
 }
 
 const inputClass =
-  "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all duration-200";
+  "w-full bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.08] light:border-black/[0.08] rounded-xl px-4 py-3 text-white/80 light:text-black/80 text-sm placeholder-white/20 light:placeholder-black/20 focus:outline-none focus:border-white/30 light:focus:border-black/30 focus:bg-white/[0.05] light:focus:bg-black/[0.05] transition-all duration-200";
 
 function StarRating({
   value,
@@ -88,17 +88,17 @@ function ReviewCard({
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.08, ease: EASE }}
-      className="p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02]"
+      className="p-6 rounded-2xl border border-white/[0.06] light:border-black/[0.06] bg-white/[0.02] light:bg-black/[0.02]"
     >
       <div className="flex items-start justify-between mb-3">
         <StarRating value={review.rating} />
-        <span className="text-xs font-mono text-white/20">{date}</span>
+        <span className="text-xs font-mono text-white/20 light:text-black/20">{date}</span>
       </div>
-      <p className="text-white/60 text-sm leading-relaxed mb-4">&ldquo;{review.body}&rdquo;</p>
+      <p className="text-white/60 light:text-black/60 text-sm leading-relaxed mb-4">&ldquo;{review.body}&rdquo;</p>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-mono text-white/30">— {review.name}</span>
+        <span className="text-xs font-mono text-white/30 light:text-black/30">— {review.name}</span>
         {review.event && (
-          <span className="text-xs font-mono text-white/20 truncate">{review.event}</span>
+          <span className="text-xs font-mono text-white/20 light:text-black/20 truncate">{review.event}</span>
         )}
       </div>
     </motion.div>
@@ -158,16 +158,16 @@ export default function Reviews() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-16"
         >
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             05 / Reviews
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Left: existing reviews */}
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white light:text-black mb-12">
               <SplitText text="What people say" inView={inView} />
             </h2>
 
@@ -176,7 +176,7 @@ export default function Reviews() {
                 initial={{ opacity: 0 }}
                 animate={inView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-white/25 text-sm font-mono"
+                className="text-white/25 light:text-black/25 text-sm font-mono"
               >
                 No reviews yet. Be the first.
               </motion.p>
@@ -198,7 +198,7 @@ export default function Reviews() {
             className="space-y-4"
           >
             <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+              <label className="block text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase mb-2">
                 Name
               </label>
               <input
@@ -212,7 +212,7 @@ export default function Reviews() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+              <label className="block text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase mb-2">
                 Event <span className="normal-case text-white/15">(optional)</span>
               </label>
               <input
@@ -225,14 +225,14 @@ export default function Reviews() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+              <label className="block text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase mb-2">
                 Rating
               </label>
               <StarRating value={rating} onChange={setRating} />
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+              <label className="block text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase mb-2">
                 Review
               </label>
               <textarea
@@ -248,13 +248,13 @@ export default function Reviews() {
             <button
               type="submit"
               disabled={status === "submitting" || rating === 0}
-              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-xl bg-white light:bg-black text-black light:text-white text-sm font-medium hover:bg-white/90 light:hover:bg-black/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {status === "submitting" ? "Submitting..." : "Leave a review"}
             </button>
 
             {status === "done" && (
-              <p className="text-xs font-mono text-white/40 text-center">
+              <p className="text-xs font-mono text-white/40 light:text-black/40 text-center">
                 Thanks for your review!
               </p>
             )}

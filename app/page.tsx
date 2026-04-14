@@ -8,11 +8,12 @@ import PhotoBreak from "@/components/PhotoBreak";
 import Services from "@/components/Services";
 import Reviews from "@/components/Reviews";
 import Booking from "@/components/Booking";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
   return (
     <>
-      <main className="bg-black">
+      <main className="bg-black light:bg-[#f5f0eb]">
         <Navbar />
         <Hero />
         <HorizontalGallery />
@@ -29,6 +30,7 @@ export default function Home() {
         <Reviews />
         <Booking />
       </main>
+      <ScrollToTop />
     </>
   );
 }

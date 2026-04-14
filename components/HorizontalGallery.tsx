@@ -34,9 +34,9 @@ interface GalleryPhotoProps {
 }
 
 function GalleryPhoto({ photo, index, x, inView, onClick }: GalleryPhotoProps) {
-  // Each photo bobs at a slightly different depth as the gallery pans
   const depthAmount = Math.sin(index * 1.3) * 20;
   const yParallax = useTransform(x, (xVal) => (xVal / 1400) * depthAmount);
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <motion.div
@@ -51,10 +51,26 @@ function GalleryPhoto({ photo, index, x, inView, onClick }: GalleryPhotoProps) {
       transition={{ duration: 0.8, delay: 0.05 + index * 0.07, ease: EASE }}
       onClick={onClick}
     >
+      {/* Skeleton shimmer while loading */}
+      {!loaded && (
+        <div className="absolute inset-0 shimmer rounded-2xl z-10" />
+      )}
+
       <motion.div
         className="absolute inset-0"
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.5, ease: EASE }}
+        whileHover={{
+          scale: 1.05,
+          filter: [
+            "brightness(1) saturate(1)",
+            "brightness(1.35) saturate(0.8) hue-rotate(6deg)",
+            "brightness(0.95) saturate(1.15) hue-rotate(-4deg)",
+            "brightness(1.07) saturate(1.08)",
+          ],
+        }}
+        transition={{
+          scale: { duration: 0.5, ease: EASE },
+          filter: { duration: 0.4, times: [0, 0.15, 0.5, 1] },
+        }}
       >
         <Image
           src={photo.src}
@@ -62,6 +78,7 @@ function GalleryPhoto({ photo, index, x, inView, onClick }: GalleryPhotoProps) {
           fill
           className="object-cover"
           sizes="60vw"
+          onLoad={() => setLoaded(true)}
         />
       </motion.div>
 
@@ -86,6 +103,8 @@ export default function HorizontalGallery() {
   const trackRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
+  const prevSelected = useRef<number | null>(null);
+  const [shutterFlash, setShutterFlash] = useState(false);
   const overflowRef = useRef(0);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -95,14 +114,22 @@ export default function HorizontalGallery() {
 
   const inView = useInView(headerRef, { once: true });
 
-  // Direct motion value — no spring lag on input, OS handles trackpad momentum
   const x = useMotionValue(0);
 
-  // Progress bar gets a gentle spring so it doesn't snap
   const progressRaw = useTransform(x, (val) =>
     overflowRef.current > 0 ? Math.max(0, Math.min(1, -val / overflowRef.current)) : 0
   );
   const progressScaleX = useSpring(progressRaw, { stiffness: 120, damping: 30 });
+
+  // Shutter flash when lightbox first opens
+  useEffect(() => {
+    if (selectedPhoto !== null && prevSelected.current === null) {
+      setShutterFlash(true);
+      const t = setTimeout(() => setShutterFlash(false), 180);
+      return () => clearTimeout(t);
+    }
+    prevSelected.current = selectedPhoto;
+  }, [selectedPhoto]);
 
   useEffect(() => {
     const measure = () => {
@@ -119,10 +146,6 @@ export default function HorizontalGallery() {
     return () => window.removeEventListener("resize", measure);
   }, [x]);
 
-  // Intercept horizontal wheel; let vertical scroll pass through untouched.
-  // Once a horizontal gesture is detected, hold the lock for 150ms so that
-  // OS momentum events (which can have varying deltaX/deltaY ratios) are all
-  // captured and the deceleration stays smooth.
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       const absX = Math.abs(e.deltaX);
@@ -153,7 +176,6 @@ export default function HorizontalGallery() {
     return () => el.removeEventListener("wheel", handleWheel);
   }, [handleWheel]);
 
-  // Touch: detect direction on move and either pan gallery or let vertical scroll through
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -225,7 +247,7 @@ export default function HorizontalGallery() {
             initial={{ opacity: 0, x: -16 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5 }}
-            className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase"
+            className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase"
           >
             01 / Gallery
           </motion.span>
@@ -235,7 +257,7 @@ export default function HorizontalGallery() {
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex items-center gap-2 text-xs font-mono text-white/20 tracking-widest uppercase"
+            className="flex items-center gap-2 text-xs font-mono text-white/20 light:text-black/20 tracking-widest uppercase"
           >
             scroll sideways
             <motion.span
@@ -270,15 +292,15 @@ export default function HorizontalGallery() {
 
         {/* Progress bar + gallery link */}
         <div className="flex items-center gap-6 mx-10 mb-8 shrink-0">
-          <div className="h-px flex-1 bg-white/[0.06]">
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]">
             <motion.div
-              className="h-full bg-white/25 origin-left"
+              className="h-full bg-white/25 light:bg-black/25 origin-left"
               style={{ scaleX: progressScaleX }}
             />
           </div>
           <a
             href="/galleries"
-            className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200 shrink-0"
+            className="text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase hover:text-white/60 light:hover:text-black/60 transition-colors duration-200 shrink-0"
           >
             Client galleries →
           </a>
@@ -288,10 +310,10 @@ export default function HorizontalGallery() {
       {/* ─── Mobile: vertical masonry ─── */}
       <section id="gallery" className="md:hidden py-24 px-5">
         <div className="flex items-center gap-4 mb-12">
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             01 / Gallery
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </div>
         <div className="columns-2 gap-3">
           {photos.map((photo, i) => (
@@ -321,12 +343,25 @@ export default function HorizontalGallery() {
         <div className="mt-10 text-center">
           <a
             href="/galleries"
-            className="text-xs font-mono text-white/25 tracking-widest uppercase hover:text-white/60 transition-colors duration-200"
+            className="text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase hover:text-white/60 light:hover:text-black/60 transition-colors duration-200"
           >
             Client galleries →
           </a>
         </div>
       </section>
+
+      {/* ─── Shutter flash ─── */}
+      <AnimatePresence>
+        {shutterFlash && (
+          <motion.div
+            className="fixed inset-0 z-[600] bg-white pointer-events-none"
+            initial={{ opacity: 0.55 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ─── Lightbox ─── */}
       <AnimatePresence>
@@ -336,7 +371,7 @@ export default function HorizontalGallery() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[500] bg-black/75 backdrop-blur-2xl flex items-center justify-center"
+            className="fixed inset-0 z-[500] bg-black/75 light:bg-white/75 backdrop-blur-2xl flex items-center justify-center"
             onClick={() => setSelectedPhoto(null)}
             onTouchStart={(e) => { lightboxTouchStartX.current = e.touches[0].clientX; }}
             onTouchEnd={(e) => {
@@ -367,10 +402,10 @@ export default function HorizontalGallery() {
                 className="object-contain max-h-[88vh] w-auto rounded-lg"
               />
               <div className="mt-3 flex items-center justify-center gap-6">
-                <p className="text-xs font-mono text-white/30 tracking-widest uppercase">
+                <p className="text-xs font-mono text-white/30 light:text-black/30 tracking-widest uppercase">
                   {photos[selectedPhoto].category}
                 </p>
-                <span className="text-xs font-mono text-white/20 tabular-nums">
+                <span className="text-xs font-mono text-white/20 light:text-black/20 tabular-nums">
                   {String(selectedPhoto + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
                 </span>
               </div>
@@ -378,17 +413,17 @@ export default function HorizontalGallery() {
 
             <button
               aria-label="Previous photo"
-              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-white/30 light:text-black/30 hover:text-white light:hover:text-black text-2xl transition-colors"
               onClick={(e) => { e.stopPropagation(); setSelectedPhoto((p) => p !== null ? (p - 1 + photos.length) % photos.length : null); }}
             >←</button>
             <button
               aria-label="Next photo"
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/30 hover:text-white text-2xl transition-colors"
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-white/30 light:text-black/30 hover:text-white light:hover:text-black text-2xl transition-colors"
               onClick={(e) => { e.stopPropagation(); setSelectedPhoto((p) => p !== null ? (p + 1) % photos.length : null); }}
             >→</button>
             <button
               aria-label="Close lightbox"
-              className="absolute top-6 right-6 text-white/30 hover:text-white text-xs font-mono tracking-widest uppercase transition-colors"
+              className="absolute top-6 right-6 text-white/30 light:text-black/30 hover:text-white light:hover:text-black text-xs font-mono tracking-widest uppercase transition-colors"
               onClick={() => setSelectedPhoto(null)}
             >ESC</button>
           </motion.div>

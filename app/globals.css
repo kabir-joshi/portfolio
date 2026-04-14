@@ -45,21 +45,55 @@ body {
   background: #555;
 }
 
-/* ── Light mode (test) ─────────────────────────────────────────────── */
+/* ── Light mode ────────────────────────────────────────────────────── */
+@custom-variant light (&:where(.light, .light *));
+
+:root {
+  --c-page:   #000000;
+  --c-glow-a: rgba(255,255,255,0.045);
+  --c-glow-b: rgba(255,255,255,0.030);
+}
+
 html.light {
-  filter: invert(1) hue-rotate(180deg);
+  --c-page:   #f5f0eb;
+  --c-glow-a: rgba(0,0,0,0.035);
+  --c-glow-b: rgba(0,0,0,0.020);
 }
 
-/* Restore media to original colors — double-invert cancels out */
-html.light img,
-html.light video,
-html.light [data-theme-restore] {
-  filter: invert(1) hue-rotate(180deg);
+body { background: var(--c-page); }
+
+html.light ::-webkit-scrollbar-track { background: #ede8e3; }
+html.light ::-webkit-scrollbar-thumb { background: #b0a9a2; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #8a8480; }
+html.light ::selection { background: rgba(0,0,0,0.12); color: #111; }
+
+/* ── Shimmer skeleton ──────────────────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
 }
 
-html.light ::-webkit-scrollbar-track { background: #f0f0f0; }
-html.light ::-webkit-scrollbar-thumb { background: #bbb; }
-html.light ::selection { background: rgba(0,0,0,0.15); color: #000; }
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+html.light .shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.04) 25%,
+    rgba(0,0,0,0.09) 50%,
+    rgba(0,0,0,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
 
 @keyframes marquee {
   from { transform: translateX(0%); }

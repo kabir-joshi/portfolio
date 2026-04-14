@@ -117,6 +117,19 @@ export default function Hero() {
     mouseY.set(0);
   }, [mouseX, mouseY]);
 
+  // Device orientation parallax (mobile) — reuses the same mouseX/mouseY motion values
+  useEffect(() => {
+    if (typeof window === "undefined" || !("DeviceOrientationEvent" in window)) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      const { gamma, beta } = e;
+      if (gamma === null || beta === null) return;
+      mouseX.set(Math.max(-0.5, Math.min(0.5, gamma / 90)));
+      mouseY.set(Math.max(-0.5, Math.min(0.5, (beta - 45) / 90)));
+    };
+    window.addEventListener("deviceorientation", handler);
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, [mouseX, mouseY]);
+
   return (
     <section
       className="relative h-screen overflow-hidden"

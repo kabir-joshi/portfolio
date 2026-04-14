@@ -17,7 +17,7 @@ const socials = [
 ];
 
 const baseInput =
-  "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 text-white/80 text-sm focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all duration-200";
+  "w-full bg-white/[0.03] light:bg-black/[0.03] border border-white/[0.08] light:border-black/[0.08] rounded-xl px-4 text-white/80 light:text-black/80 text-sm focus:outline-none focus:border-white/30 light:focus:border-black/30 focus:bg-white/[0.05] light:focus:bg-black/[0.05] transition-all duration-200";
 
 function FloatingInput({
   label,
@@ -52,7 +52,7 @@ function FloatingInput({
         htmlFor={id}
         animate={{ y: floated ? 0 : 8, fontSize: floated ? "0.6rem" : "0.75rem" }}
         transition={{ duration: 0.15, ease: EASE }}
-        className="absolute left-4 top-2 font-mono text-white/25 tracking-widest uppercase pointer-events-none"
+        className="absolute left-4 top-2 font-mono text-white/25 light:text-black/25 tracking-widest uppercase pointer-events-none"
       >
         {label}
       </motion.label>
@@ -90,7 +90,7 @@ function FloatingTextarea({
         htmlFor={id}
         animate={{ y: floated ? 0 : 8, fontSize: floated ? "0.6rem" : "0.75rem" }}
         transition={{ duration: 0.15, ease: EASE }}
-        className="absolute left-4 top-2 font-mono text-white/25 tracking-widest uppercase pointer-events-none"
+        className="absolute left-4 top-2 font-mono text-white/25 light:text-black/25 tracking-widest uppercase pointer-events-none"
       >
         {label}
       </motion.label>
@@ -146,10 +146,10 @@ export default function Booking() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4 mb-16"
         >
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             06 / Book
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
@@ -161,16 +161,16 @@ export default function Booking() {
               transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
               className="text-5xl md:text-7xl font-bold tracking-tight leading-none mb-8"
             >
-              <span className="text-white">Let&apos;s create</span>
+              <span className="text-white light:text-black">Let&apos;s create</span>
               <br />
-              <span className="text-[#86868b]">something.</span>
+              <span className="text-[#86868b] light:text-[#5a5a5a]">something.</span>
             </motion.h2>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[#86868b] text-lg mb-12 leading-relaxed"
+              className="text-[#86868b] light:text-[#5a5a5a] text-lg mb-12 leading-relaxed"
             >
               Have a shoot in mind? Fill out the form and I&apos;ll get back to
               you within 24 hours.
@@ -195,7 +195,7 @@ export default function Booking() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.4, delay: 0.4 + i * 0.08 }}
-                  className="text-sm text-white/30 hover:text-white transition-colors duration-200 underline-offset-4 hover:underline"
+                  className="text-sm text-white/30 light:text-black/30 hover:text-white light:hover:text-black transition-colors duration-200 underline-offset-4 hover:underline"
                 >
                   {social.label}
                 </motion.a>
@@ -230,7 +230,7 @@ export default function Booking() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
+              <label className="block text-xs font-mono text-white/25 light:text-black/25 tracking-widest uppercase mb-2">
                 Session type
               </label>
               <div className="relative">
@@ -245,7 +245,7 @@ export default function Booking() {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/30">
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-white/30 light:text-black/30">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M2 4.5L6 8.5L10 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -271,13 +271,13 @@ export default function Booking() {
             <button
               type="submit"
               disabled={status === "submitting" || status === "done"}
-              className="w-full py-4 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-xl bg-white light:bg-black text-black light:text-white text-sm font-medium hover:bg-white/90 light:hover:bg-black/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {status === "submitting" ? "Sending..." : status === "done" ? "Sent!" : "Send inquiry"}
             </button>
 
             {status === "done" && (
-              <p className="text-xs font-mono text-white/40 text-center">
+              <p className="text-xs font-mono text-white/40 light:text-black/40 text-center">
                 Got it — I&apos;ll get back to you within 24 hours.
               </p>
             )}
@@ -295,9 +295,9 @@ export default function Booking() {
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.7, delay: 0.6 }}
-        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/[0.06] flex items-center justify-between"
+        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/[0.06] light:border-black/[0.06] flex items-center justify-between"
       >
-        <span className="text-xs text-white/20 font-mono">
+        <span className="text-xs text-white/20 light:text-black/20 font-mono">
           © {new Date().getFullYear()} Kabir Joshi
         </span>
         <div className="flex items-center gap-6">
@@ -305,13 +305,13 @@ export default function Booking() {
             href="https://www.instagram.com/kabirjphoto/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-white/20 font-mono hover:text-white/50 transition-colors duration-200"
+            className="text-xs text-white/20 light:text-black/20 font-mono hover:text-white/50 light:hover:text-black/50 transition-colors duration-200"
           >
             Instagram
           </a>
           <a
             href="mailto:mail@kabirj.com"
-            className="text-xs text-white/20 font-mono hover:text-white/50 transition-colors duration-200"
+            className="text-xs text-white/20 light:text-black/20 font-mono hover:text-white/50 light:hover:text-black/50 transition-colors duration-200"
           >
             mail@kabirj.com
           </a>

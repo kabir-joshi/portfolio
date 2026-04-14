@@ -102,10 +102,10 @@ function StatCounter({ target, suffix, label, inView }: { target: number; suffix
   const count = useCounter(target, inView);
   return (
     <div>
-      <div className="text-2xl font-bold text-white mb-1 font-mono tabular-nums">
+      <div className="text-2xl font-bold text-white light:text-black mb-1 font-mono tabular-nums">
         {count}{suffix}
       </div>
-      <div className="text-xs text-[#86868b] font-mono leading-snug">{label}</div>
+      <div className="text-xs text-[#86868b] light:text-[#5a5a5a] font-mono leading-snug">{label}</div>
     </div>
   );
 }
@@ -133,10 +133,10 @@ export default function About() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-4 mb-16"
         >
-          <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">
+          <span className="text-xs font-mono text-white/25 light:text-black/25 tracking-[0.3em] uppercase">
             02 / About
           </span>
-          <div className="h-px flex-1 bg-white/[0.06]" />
+          <div className="h-px flex-1 bg-white/[0.06] light:bg-black/[0.06]" />
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
@@ -152,7 +152,7 @@ export default function About() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             {/* Wipe reveal overlay */}
             <motion.div
-              className="absolute inset-0 bg-[#080808] z-10"
+              className="absolute inset-0 bg-[#080808] light:bg-[#f5f0eb] z-10"
               initial={{ x: "0%" }}
               animate={inView ? { x: "101%" } : {}}
               transition={{ duration: 1.1, delay: 0.1, ease: EASE }}
@@ -161,16 +161,16 @@ export default function About() {
 
           {/* Text */}
           <div ref={bodyRef} className="flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-8 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white light:text-black mb-8 leading-tight">
               <RevealLine delay={0.05} inView={bodyInView}>
                 I shoot what
               </RevealLine>
               <RevealLine delay={0.15} inView={bodyInView}>
-                <span className="text-[#86868b]">moves me.</span>
+                <span className="text-[#86868b] light:text-[#5a5a5a]">moves me.</span>
               </RevealLine>
             </h2>
 
-            <div className="space-y-5 text-[#86868b] leading-relaxed mb-12">
+            <div className="space-y-5 text-[#86868b] light:text-[#5a5a5a] leading-relaxed mb-12">
               <RevealLine delay={0.25} inView={bodyInView}>
                 <ReadingText
                   text="I specialize in track & field, cross country, and road racing — the grit, the glory, the split-second moments that define competition."
@@ -194,7 +194,7 @@ export default function About() {
               initial={{ opacity: 0, y: 20 }}
               animate={bodyInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.5, ease: EASE }}
-              className="grid grid-cols-3 gap-4 pt-8 border-t border-white/[0.06]"
+              className="grid grid-cols-3 gap-4 pt-8 border-t border-white/[0.06] light:border-black/[0.06]"
             >
               {stats.map((stat) => (
                 <StatCounter key={stat.label} {...stat} inView={bodyInView} />
