@@ -73,27 +73,30 @@ export default function Navbar() {
         className="absolute bottom-0 left-0 h-px w-full bg-white/30 origin-left"
         style={{ scaleX: progressScaleX }}
       />
-      <div className="relative max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-        <AnimatePresence mode="wait">
-          {scrolled && activeSection && (
-            <motion.span
-              key={activeSection.num}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2, ease: EASE }}
-              className="hidden md:block absolute left-1/2 -translate-x-1/2 text-xs font-mono text-white/25 tracking-[0.3em] pointer-events-none"
-            >
-              {activeSection.num} / {activeSection.label.toUpperCase()}
-            </motion.span>
-          )}
-        </AnimatePresence>
-        <Link
-          href="/"
-          className="text-white font-semibold tracking-tight text-lg hover:opacity-70 transition-opacity"
-        >
-          kj.
-        </Link>
+      <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="text-white font-semibold tracking-tight text-lg hover:opacity-70 transition-opacity"
+          >
+            kj.
+          </Link>
+          <AnimatePresence mode="wait">
+            {scrolled && activeSection && (
+              <motion.span
+                key={activeSection.num}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 6 }}
+                transition={{ duration: 0.2, ease: EASE }}
+                className="hidden md:flex items-center gap-2 text-xs font-mono text-white/25 tracking-[0.25em] pointer-events-none"
+              >
+                <span className="text-white/10">·</span>
+                {activeSection.num} / {activeSection.label.toUpperCase()}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
