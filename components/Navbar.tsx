@@ -49,6 +49,22 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<{ num: string; label: string } | null>(null);
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("kj-theme");
+    if (saved === "light") {
+      setIsLight(true);
+      document.documentElement.classList.add("light");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isLight;
+    setIsLight(next);
+    document.documentElement.classList.toggle("light", next);
+    localStorage.setItem("kj-theme", next ? "light" : "dark");
+  };
   const pathname = usePathname();
   const { scrollYProgress } = useScroll();
   const progressScaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
@@ -143,6 +159,14 @@ export default function Navbar() {
               )}
             </Link>
           ))}
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle light mode"
+            className="text-white/30 hover:text-white/70 transition-colors duration-200 text-base leading-none"
+            title={isLight ? "Switch to dark" : "Switch to light"}
+          >
+            {isLight ? "●" : "○"}
+          </button>
           <Link
             href="/#booking"
             className="text-sm px-4 py-2 rounded-full border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all duration-200"

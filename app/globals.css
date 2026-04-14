@@ -45,6 +45,22 @@ body {
   background: #555;
 }
 
+/* ── Light mode (test) ─────────────────────────────────────────────── */
+html.light {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Restore media to original colors — double-invert cancels out */
+html.light img,
+html.light video,
+html.light [data-theme-restore] {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.light ::-webkit-scrollbar-track { background: #f0f0f0; }
+html.light ::-webkit-scrollbar-thumb { background: #bbb; }
+html.light ::selection { background: rgba(0,0,0,0.15); color: #000; }
+
 @keyframes marquee {
   from { transform: translateX(0%); }
   to   { transform: translateX(-50%); }
