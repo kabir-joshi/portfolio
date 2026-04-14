@@ -12,9 +12,15 @@ const containerVariants: Variants = {
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: EASE } },
+  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.9, ease: EASE } },
 };
+
+const HERO_TICKER = [
+  "IHSA State XC", "Chicago Marathon", "Cross Country",
+  "Track & Field", "Road Racing", "2025 Season",
+  "Golden Hour", "Finish Line",
+];
 
 const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -140,9 +146,13 @@ export default function Hero() {
         className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center"
       >
         <motion.div variants={itemVariants}>
-          <span className="inline-block text-xs font-mono text-white/50 tracking-[0.35em] uppercase mb-10 px-4 py-2 rounded-full border border-white/15">
+          <motion.span
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.5 }}
+            className="inline-block text-xs font-mono text-white/50 tracking-[0.35em] uppercase mb-10 px-4 py-2 rounded-full border border-white/15"
+          >
             available for bookings
-          </span>
+          </motion.span>
         </motion.div>
 
         <motion.h1
@@ -183,6 +193,31 @@ export default function Hero() {
             Book a session
           </MagneticButton>
         </motion.div>
+      </motion.div>
+
+      {/* Bottom ticker — opposite direction to top Marquee */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1.2 }}
+        style={{ opacity: textOpacity }}
+        className="absolute bottom-16 left-0 right-0 overflow-hidden z-10 pointer-events-none"
+      >
+        <div className="flex whitespace-nowrap animate-marquee-reverse">
+          {[0, 1].map((copy) => (
+            <span key={copy} className="flex shrink-0 items-center">
+              {HERO_TICKER.map((item) => (
+                <span
+                  key={item}
+                  className="flex items-center gap-8 mx-8 text-[10px] font-mono text-white/15 tracking-[0.35em] uppercase"
+                >
+                  {item}
+                  <span className="text-white/8">·</span>
+                </span>
+              ))}
+            </span>
+          ))}
+        </div>
       </motion.div>
 
       {/* Scroll indicator */}

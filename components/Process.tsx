@@ -51,6 +51,16 @@ export default function Process() {
           <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
+        {/* Animated connecting line */}
+        <div className="hidden md:block h-px mb-8 bg-white/[0.04] overflow-hidden relative">
+          <motion.div
+            className="absolute inset-0 bg-white/25 origin-left"
+            initial={{ scaleX: 0 }}
+            animate={inView ? { scaleX: 1 } : {}}
+            transition={{ duration: 1.4, delay: 0.1, ease: EASE }}
+          />
+        </div>
+
         <div className="grid md:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden">
           {steps.map((step, i) => (
             <motion.div

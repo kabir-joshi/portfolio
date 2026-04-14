@@ -4,6 +4,25 @@ import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
 import { useCallback, useRef } from "react";
 import { EASE } from "@/lib/easing";
 
+function SplitText({ text, inView, baseDelay = 0.1 }: { text: string; inView: boolean; baseDelay?: number }) {
+  return (
+    <>
+      {text.split(" ").map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "110%", filter: "blur(4px)" }}
+            animate={inView ? { y: "0%", filter: "blur(0px)" } : {}}
+            transition={{ duration: 0.7, delay: baseDelay + i * 0.1, ease: EASE }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </>
+  );
+}
+
 function TiltCard({ children, className }: { children: React.ReactNode; className: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const rotateX = useMotionValue(0);
@@ -89,14 +108,9 @@ export default function Services() {
           <div className="h-px flex-1 bg-white/[0.06]" />
         </motion.div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12"
-        >
-          What I offer
-        </motion.h2>
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12">
+          <SplitText text="What I offer" inView={inView} />
+        </h2>
 
         <div className="grid md:grid-cols-3 gap-4">
           {services.map((service, i) => (

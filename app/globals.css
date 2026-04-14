@@ -54,6 +54,15 @@ body {
   animation: marquee 35s linear infinite;
 }
 
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0%); }
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 40s linear infinite;
+}
+
 @keyframes glow-drift-a {
   0%, 100% { transform: translate(0, 0); }
   50%       { transform: translate(60px, 40px); }

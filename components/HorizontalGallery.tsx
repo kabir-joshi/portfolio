@@ -310,7 +310,7 @@ export default function HorizontalGallery() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[500] bg-black/95 flex items-center justify-center"
+            className="fixed inset-0 z-[500] bg-black/75 backdrop-blur-2xl flex items-center justify-center"
             onClick={() => setSelectedPhoto(null)}
             onTouchStart={(e) => { lightboxTouchStartX.current = e.touches[0].clientX; }}
             onTouchEnd={(e) => {

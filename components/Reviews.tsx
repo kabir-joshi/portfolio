@@ -4,6 +4,25 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { EASE } from "@/lib/easing";
 
+function SplitText({ text, inView, baseDelay = 0.1 }: { text: string; inView: boolean; baseDelay?: number }) {
+  return (
+    <>
+      {text.split(" ").map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden mr-[0.3em]">
+          <motion.span
+            className="inline-block"
+            initial={{ y: "110%", filter: "blur(4px)" }}
+            animate={inView ? { y: "0%", filter: "blur(0px)" } : {}}
+            transition={{ duration: 0.7, delay: baseDelay + i * 0.1, ease: EASE }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </>
+  );
+}
+
 interface Review {
   id: string;
   name: string;
@@ -148,14 +167,9 @@ export default function Reviews() {
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Left: existing reviews */}
           <div>
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
-              className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12"
-            >
-              What people say
-            </motion.h2>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-12">
+              <SplitText text="What people say" inView={inView} />
+            </h2>
 
             {reviews.length === 0 ? (
               <motion.p

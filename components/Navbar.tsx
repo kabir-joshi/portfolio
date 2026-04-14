@@ -6,6 +6,14 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { EASE } from "@/lib/easing";
 import Link from "next/link";
 
+const SECTIONS = [
+  { id: "gallery",  num: "01", label: "Gallery"  },
+  { id: "about",    num: "02", label: "About"     },
+  { id: "services", num: "04", label: "Services"  },
+  { id: "reviews",  num: "05", label: "Reviews"   },
+  { id: "booking",  num: "06", label: "Booking"   },
+];
+
 const links = [
   { label: "Portfolio", href: "/portfolio" },
   { label: "Pricing", href: "/pricing" },
@@ -16,9 +24,30 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<{ num: string; label: string } | null>(null);
   const pathname = usePathname();
   const { scrollYProgress } = useScroll();
   const progressScaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const match = SECTIONS.find((s) => s.id === entry.target.id);
+            if (match) setActiveSection(match);
+          }
+        }
+      },
+      { rootMargin: "-30% 0px -30% 0px", threshold: 0 }
+    );
+    SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -44,7 +73,21 @@ export default function Navbar() {
         className="absolute bottom-0 left-0 h-px w-full bg-white/30 origin-left"
         style={{ scaleX: progressScaleX }}
       />
-      <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div className="relative max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+        <AnimatePresence mode="wait">
+          {scrolled && activeSection && (
+            <motion.span
+              key={activeSection.num}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: EASE }}
+              className="hidden md:block absolute left-1/2 -translate-x-1/2 text-xs font-mono text-white/25 tracking-[0.3em] pointer-events-none"
+            >
+              {activeSection.num} / {activeSection.label.toUpperCase()}
+            </motion.span>
+          )}
+        </AnimatePresence>
         <Link
           href="/"
           className="text-white font-semibold tracking-tight text-lg hover:opacity-70 transition-opacity"

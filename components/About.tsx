@@ -93,21 +93,21 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-16 items-start">
           {/* Photo with clip-path reveal */}
           <div className="aspect-[3/4] rounded-2xl overflow-hidden relative">
+            <Image
+              src="/photos/finals-11.JPG"
+              alt="Athlete celebrates at the finish line"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            {/* Wipe reveal overlay */}
             <motion.div
-              className="absolute inset-0"
-              initial={{ clipPath: "inset(0 0 100% 0)" }}
-              animate={inView ? { clipPath: "inset(0 0 0% 0)" } : {}}
-              transition={{ duration: 1.2, delay: 0.1, ease: EASE }}
-            >
-              <Image
-                src="/photos/finals-11.JPG"
-                alt="Athlete celebrates at the finish line"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </motion.div>
+              className="absolute inset-0 bg-[#080808] z-10"
+              initial={{ x: "0%" }}
+              animate={inView ? { x: "101%" } : {}}
+              transition={{ duration: 1.1, delay: 0.1, ease: EASE }}
+            />
           </div>
 
           {/* Text */}
