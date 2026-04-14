@@ -340,9 +340,14 @@ export default function HorizontalGallery() {
                 height={1400}
                 className="object-contain max-h-[88vh] w-auto rounded-lg"
               />
-              <p className="mt-3 text-center text-xs font-mono text-white/30 tracking-widest uppercase">
-                {photos[selectedPhoto].category}
-              </p>
+              <div className="mt-3 flex items-center justify-center gap-6">
+                <p className="text-xs font-mono text-white/30 tracking-widest uppercase">
+                  {photos[selectedPhoto].category}
+                </p>
+                <span className="text-xs font-mono text-white/20 tabular-nums">
+                  {String(selectedPhoto + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+                </span>
+              </div>
             </motion.div>
 
             <button

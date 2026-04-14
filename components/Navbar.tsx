@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { EASE } from "@/lib/easing";
 import Link from "next/link";
 
@@ -17,6 +17,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { scrollYProgress } = useScroll();
+  const progressScaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -37,6 +39,11 @@ export default function Navbar() {
           : "bg-transparent"
       }`}
     >
+      {/* Scroll progress bar */}
+      <motion.div
+        className="absolute bottom-0 left-0 h-px w-full bg-white/30 origin-left"
+        style={{ scaleX: progressScaleX }}
+      />
       <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
         <Link
           href="/"

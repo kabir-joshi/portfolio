@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import HorizontalGallery from "@/components/HorizontalGallery";
+import Marquee from "@/components/Marquee";
 import About from "@/components/About";
 import Process from "@/components/Process";
 import PhotoBreak from "@/components/PhotoBreak";
@@ -15,6 +16,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <HorizontalGallery />
+        <Marquee />
         <About />
         <Process />
         <PhotoBreak

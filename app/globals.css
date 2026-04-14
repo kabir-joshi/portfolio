@@ -44,3 +44,30 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+@keyframes marquee {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+}
+
+@keyframes glow-drift-a {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(60px, 40px); }
+}
+
+@keyframes glow-drift-b {
+  0%, 100% { transform: translate(0, 0); }
+  50%       { transform: translate(-50px, -30px); }
+}
+
+.ambient-glow-a {
+  animation: glow-drift-a 18s ease-in-out infinite;
+}
+
+.ambient-glow-b {
+  animation: glow-drift-b 22s ease-in-out infinite;
+}

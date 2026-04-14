@@ -53,14 +53,28 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body>
+        {/* Ambient glow orbs */}
+        <div
+          aria-hidden
+          className="ambient-glow-a pointer-events-none fixed top-[-200px] left-[-200px] w-[700px] h-[700px] z-0"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.045) 0%, transparent 70%)" }}
+        />
+        <div
+          aria-hidden
+          className="ambient-glow-b pointer-events-none fixed bottom-[-200px] right-[-200px] w-[600px] h-[600px] z-0"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)" }}
+        />
+
         {children}
-        {/* Subtle film grain overlay */}
+
+        {/* Film grain overlay */}
         <div
           aria-hidden
           className="pointer-events-none fixed inset-0 z-[998]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-            opacity: 0.04,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundSize: "180px 180px",
+            opacity: 0.038,
           }}
         />
       </body>
