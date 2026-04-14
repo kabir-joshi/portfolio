@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useVelocity } from "framer-motion";
 import type { Variants } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
@@ -88,6 +88,11 @@ export default function Hero() {
   const textOpacity = useTransform(scrollY, [0, 350], [1, 0]);
   const textY = useTransform(scrollY, [0, 350], [0, -50]);
 
+  // Scroll-velocity skew on hero heading
+  const scrollVelocity = useVelocity(scrollY);
+  const skewX = useTransform(scrollVelocity, [-3000, 0, 3000], [3, 0, -3]);
+  const smoothSkewX = useSpring(skewX, { stiffness: 150, damping: 30 });
+
   const [scrambleActive, setScrambleActive] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setScrambleActive(true), 480);
@@ -157,6 +162,7 @@ export default function Hero() {
 
         <motion.h1
           variants={itemVariants}
+          style={{ skewX: smoothSkewX }}
           className="text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-none mb-4 text-white font-mono"
         >
           {heroName}

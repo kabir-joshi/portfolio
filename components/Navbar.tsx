@@ -6,6 +6,30 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { EASE } from "@/lib/easing";
 import Link from "next/link";
 
+const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$";
+
+function useLogoScramble() {
+  const [text, setText] = useState("kj.");
+  useEffect(() => {
+    const target = "kj.";
+    let frame = 0;
+    const total = 14;
+    const id = setInterval(() => {
+      setText(
+        target.split("").map((char, i) => {
+          if (char === ".") return ".";
+          if (frame >= (i / target.length) * total + 4) return char;
+          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        }).join("")
+      );
+      frame++;
+      if (frame > total + 5) clearInterval(id);
+    }, 40);
+    return () => clearInterval(id);
+  }, []);
+  return text;
+}
+
 const SECTIONS = [
   { id: "gallery",  num: "01", label: "Gallery"  },
   { id: "about",    num: "02", label: "About"     },
@@ -56,6 +80,7 @@ export default function Navbar() {
   }, []);
 
   const isActive = (href: string) => pathname === href;
+  const logoText = useLogoScramble();
 
   return (
     <motion.header
@@ -77,9 +102,9 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-white font-semibold tracking-tight text-lg hover:opacity-70 transition-opacity"
+            className="text-white font-semibold tracking-tight text-lg hover:opacity-70 transition-opacity font-mono"
           >
-            kj.
+            {logoText}
           </Link>
           <AnimatePresence mode="wait">
             {scrolled && activeSection && (

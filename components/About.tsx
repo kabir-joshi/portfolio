@@ -1,9 +1,52 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
+
+function WordSpan({
+  word,
+  progress,
+  threshold,
+}: {
+  word: string;
+  progress: MotionValue<number>;
+  threshold: number;
+}) {
+  const opacity = useTransform(
+    progress,
+    [threshold - 0.05, threshold, threshold + 0.05],
+    [0.22, 1, 1]
+  );
+  return (
+    <motion.span style={{ opacity }} className="inline">
+      {word}{" "}
+    </motion.span>
+  );
+}
+
+function ReadingText({
+  text,
+  progress,
+  start,
+  end,
+}: {
+  text: string;
+  progress: MotionValue<number>;
+  start: number;
+  end: number;
+}) {
+  const words = text.split(/\s+/).filter(Boolean);
+  return (
+    <>
+      {words.map((word, i) => {
+        const t = start + (i / Math.max(words.length - 1, 1)) * (end - start);
+        return <WordSpan key={i} word={word} progress={progress} threshold={t} />;
+      })}
+    </>
+  );
+}
 
 function RevealLine({
   children,
@@ -74,8 +117,14 @@ export default function About() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const bodyInView = useInView(bodyRef, { once: true, margin: "-60px" });
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+
   return (
-    <section id="about" className="py-32 px-6">
+    <section id="about" ref={sectionRef} className="py-32 px-6">
       <div className="max-w-6xl mx-auto">
         <motion.div
           ref={ref}
@@ -123,14 +172,20 @@ export default function About() {
 
             <div className="space-y-5 text-[#86868b] leading-relaxed mb-12">
               <RevealLine delay={0.25} inView={bodyInView}>
-                I specialize in track & field, cross country, and road racing —
-                the grit, the glory, the split-second moments that define
-                competition.
+                <ReadingText
+                  text="I specialize in track & field, cross country, and road racing — the grit, the glory, the split-second moments that define competition."
+                  progress={scrollYProgress}
+                  start={0.25}
+                  end={0.48}
+                />
               </RevealLine>
               <RevealLine delay={0.35} inView={bodyInView}>
-                Whether it&apos;s a state championship or a local 5K, I bring
-                the same attention to light, timing, and story to every event I
-                cover.
+                <ReadingText
+                  text="Whether it's a state championship or a local 5K, I bring the same attention to light, timing, and story to every event I cover."
+                  progress={scrollYProgress}
+                  start={0.42}
+                  end={0.62}
+                />
               </RevealLine>
             </div>
 

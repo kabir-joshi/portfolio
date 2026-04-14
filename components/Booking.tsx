@@ -16,8 +16,87 @@ const socials = [
   { label: "Email", href: "mailto:mail@kabirj.com" },
 ];
 
-const inputClass =
-  "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all duration-200";
+const baseInput =
+  "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 text-white/80 text-sm focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all duration-200";
+
+function FloatingInput({
+  label,
+  id,
+  type = "text",
+  value,
+  onChange,
+  required,
+}: {
+  label: string;
+  id: string;
+  type?: string;
+  value: string;
+  onChange: (v: string) => void;
+  required?: boolean;
+}) {
+  const [focused, setFocused] = useState(false);
+  const floated = focused || value.length > 0;
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={type}
+        required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={`${baseInput} pt-6 pb-2`}
+      />
+      <motion.label
+        htmlFor={id}
+        animate={{ y: floated ? 0 : 8, fontSize: floated ? "0.6rem" : "0.75rem" }}
+        transition={{ duration: 0.15, ease: EASE }}
+        className="absolute left-4 top-2 font-mono text-white/25 tracking-widest uppercase pointer-events-none"
+      >
+        {label}
+      </motion.label>
+    </div>
+  );
+}
+
+function FloatingTextarea({
+  label,
+  id,
+  value,
+  onChange,
+  rows = 5,
+}: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  rows?: number;
+}) {
+  const [focused, setFocused] = useState(false);
+  const floated = focused || value.length > 0;
+  return (
+    <div className="relative">
+      <textarea
+        id={id}
+        value={value}
+        rows={rows}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={`${baseInput} pt-6 pb-2 resize-none`}
+      />
+      <motion.label
+        htmlFor={id}
+        animate={{ y: floated ? 0 : 8, fontSize: floated ? "0.6rem" : "0.75rem" }}
+        transition={{ duration: 0.15, ease: EASE }}
+        className="absolute left-4 top-2 font-mono text-white/25 tracking-widest uppercase pointer-events-none"
+      >
+        {label}
+      </motion.label>
+    </div>
+  );
+}
 
 export default function Booking() {
   const ref = useRef<HTMLDivElement>(null);
@@ -133,32 +212,21 @@ export default function Booking() {
             className="space-y-4"
           >
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className={inputClass}
-                />
-              </div>
+              <FloatingInput
+                label="Name"
+                id="booking-name"
+                value={name}
+                onChange={setName}
+                required
+              />
+              <FloatingInput
+                label="Email"
+                id="booking-email"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                required
+              />
             </div>
 
             <div>
@@ -169,7 +237,7 @@ export default function Booking() {
                 <select
                   value={session}
                   onChange={(e) => setSession(e.target.value)}
-                  className={`${inputClass} appearance-none cursor-pointer pr-10`}
+                  className={`${baseInput} py-3 appearance-none cursor-pointer pr-10`}
                 >
                   {sessionTypes.map((type) => (
                     <option key={type} value={type} className="bg-[#111]">
@@ -185,31 +253,20 @@ export default function Booking() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
-                Preferred date
-              </label>
-              <input
-                type="text"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                placeholder="e.g. Weekend in April, flexible"
-                className={inputClass}
-              />
-            </div>
+            <FloatingInput
+              label="Preferred date"
+              id="booking-date"
+              value={date}
+              onChange={setDate}
+            />
 
-            <div>
-              <label className="block text-xs font-mono text-white/25 tracking-widest uppercase mb-2">
-                Message
-              </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tell me about your vision..."
-                rows={5}
-                className={`${inputClass} resize-none`}
-              />
-            </div>
+            <FloatingTextarea
+              label="Message"
+              id="booking-message"
+              value={message}
+              onChange={setMessage}
+              rows={5}
+            />
 
             <button
               type="submit"

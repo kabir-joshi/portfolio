@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import SmoothScroll from "@/components/SmoothScroll";
+import Intro from "@/components/Intro";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,6 +55,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body>
+        <Intro />
+        <SmoothScroll>
         {/* Ambient glow orbs */}
         <div
           aria-hidden
@@ -67,6 +71,7 @@ export default function RootLayout({
 
         {children}
 
+        </SmoothScroll>
         {/* Film grain overlay */}
         <div
           aria-hidden

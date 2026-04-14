@@ -8,6 +8,7 @@ import {
   useSpring,
   AnimatePresence,
   useInView,
+  MotionValue,
 } from "framer-motion";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
@@ -23,6 +24,62 @@ const photos = [
   { id: 8, src: "/photos/finals-20.JPG", alt: "Athletes embrace after race", category: "Track & Field", ratio: 3 / 4 },
   { id: 9, src: "/photos/20251108-DSC03732.jpg", alt: "Cross country finish celebration", category: "Cross Country", ratio: 4 / 3 },
 ];
+
+interface GalleryPhotoProps {
+  photo: (typeof photos)[number];
+  index: number;
+  x: MotionValue<number>;
+  inView: boolean;
+  onClick: () => void;
+}
+
+function GalleryPhoto({ photo, index, x, inView, onClick }: GalleryPhotoProps) {
+  // Each photo bobs at a slightly different depth as the gallery pans
+  const depthAmount = Math.sin(index * 1.3) * 20;
+  const yParallax = useTransform(x, (xVal) => (xVal / 1400) * depthAmount);
+
+  return (
+    <motion.div
+      className="shrink-0 relative overflow-hidden rounded-2xl group cursor-pointer"
+      style={{
+        height: "62vh",
+        width: `calc(62vh * ${photo.ratio})`,
+        y: yParallax,
+      }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, delay: 0.05 + index * 0.07, ease: EASE }}
+      onClick={onClick}
+    >
+      <motion.div
+        className="absolute inset-0"
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.5, ease: EASE }}
+      >
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          className="object-cover"
+          sizes="60vw"
+        />
+      </motion.div>
+
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400" />
+
+      <motion.div
+        className="absolute bottom-4 left-4"
+        initial={{ opacity: 0, y: 6 }}
+        whileHover={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
+          {photo.category}
+        </span>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export default function HorizontalGallery() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -198,45 +255,14 @@ export default function HorizontalGallery() {
             style={{ x }}
           >
             {photos.map((photo, i) => (
-              <motion.div
+              <GalleryPhoto
                 key={photo.id}
-                className="shrink-0 relative overflow-hidden rounded-2xl group cursor-pointer"
-                style={{
-                  height: "62vh",
-                  width: `calc(62vh * ${photo.ratio})`,
-                }}
-                initial={{ opacity: 0, y: 40 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.05 + i * 0.07, ease: EASE }}
+                photo={photo}
+                index={i}
+                x={x}
+                inView={inView}
                 onClick={() => setSelectedPhoto(i)}
-              >
-                <motion.div
-                  className="absolute inset-0"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover"
-                    sizes="60vw"
-                  />
-                </motion.div>
-
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400" />
-
-                <motion.div
-                  className="absolute bottom-4 left-4"
-                  initial={{ opacity: 0, y: 6 }}
-                  whileHover={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span className="text-xs font-mono text-white/70 tracking-widest uppercase">
-                    {photo.category}
-                  </span>
-                </motion.div>
-              </motion.div>
+              />
             ))}
             <div className="shrink-0 w-[10vw]" />
           </motion.div>
