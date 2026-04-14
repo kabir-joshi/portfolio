@@ -107,7 +107,7 @@ export default function Services() {
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
               className="h-full"
             >
-            <TiltCard className="group relative flex flex-col p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default">
+            <TiltCard className="group relative flex flex-col h-full p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all duration-300 cursor-default">
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/20">{service.number}</span>
                 <span className="text-xs font-mono text-white/40">{service.price}</span>
