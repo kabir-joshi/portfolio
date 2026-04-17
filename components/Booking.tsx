@@ -211,7 +211,7 @@ export default function Booking() {
             transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
             className="space-y-4"
           >
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FloatingInput
                 label="Name"
                 id="booking-name"
@@ -295,7 +295,7 @@ export default function Booking() {
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.7, delay: 0.6 }}
-        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/[0.06] light:border-black/[0.06] flex items-center justify-between"
+        className="max-w-6xl mx-auto mt-32 pt-8 border-t border-white/[0.06] light:border-black/[0.06] flex flex-wrap items-center justify-between gap-y-4"
       >
         <span className="text-xs text-white/20 light:text-black/20 font-mono">
           © {new Date().getFullYear()} Kabir Joshi

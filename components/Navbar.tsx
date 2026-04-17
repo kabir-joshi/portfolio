@@ -118,8 +118,9 @@ export default function Navbar() {
   const eggTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleLogoClick = useCallback((e: React.MouseEvent) => {
-    // Only count rapid clicks (reset after 2s of no clicks)
     if (eggTimeout.current) clearTimeout(eggTimeout.current);
+    // Prevent nav only for rapid clicks 2-4 (building toward easter egg)
+    if (logoClicks > 0 && logoClicks < 4) e.preventDefault();
     setLogoClicks((c) => {
       const next = c + 1;
       if (next >= 5) {
@@ -130,8 +131,6 @@ export default function Navbar() {
       eggTimeout.current = setTimeout(() => setLogoClicks(0), 2000);
       return next;
     });
-    // Still navigate if it's the 5th click
-    if (logoClicks < 4) e.preventDefault();
   }, [logoClicks]);
 
   useEffect(() => {

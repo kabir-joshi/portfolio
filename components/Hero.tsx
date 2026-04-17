@@ -132,7 +132,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative h-screen overflow-hidden"
+      className="relative h-dvh overflow-hidden"
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
     >
@@ -176,7 +176,7 @@ export default function Hero() {
         <motion.h1
           variants={itemVariants}
           style={{ skewX: smoothSkewX }}
-          className="text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-none mb-4 text-white font-mono"
+          className="text-[2.75rem] sm:text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter leading-none mb-4 text-white font-mono"
         >
           {heroName}
         </motion.h1>
@@ -220,7 +220,7 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1.2 }}
         style={{ opacity: textOpacity }}
-        className="absolute bottom-16 left-0 right-0 overflow-hidden z-10 pointer-events-none"
+        className="absolute bottom-16 left-0 right-0 overflow-hidden z-10 pointer-events-none hidden sm:block"
       >
         <div className="flex whitespace-nowrap animate-marquee-reverse">
           {[0, 1].map((copy) => (

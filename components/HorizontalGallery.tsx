@@ -399,7 +399,7 @@ export default function HorizontalGallery() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.93, opacity: 0 }}
               transition={{ duration: 0.3, ease: EASE }}
-              className="relative max-w-[92vw] max-h-[74vh]"
+              className="relative max-w-[92vw] max-h-[88vh] sm:max-h-[74vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <Image
@@ -407,7 +407,7 @@ export default function HorizontalGallery() {
                 alt={photos[selectedPhoto].alt}
                 width={1800}
                 height={1400}
-                className="object-contain max-h-[74vh] w-auto rounded-lg"
+                className="object-contain max-h-[88vh] sm:max-h-[74vh] w-auto rounded-lg"
               />
               <div className="mt-3 flex items-center justify-center gap-6">
                 <p className="text-xs font-mono text-white/30 light:text-black/30 tracking-widest uppercase">
@@ -425,7 +425,7 @@ export default function HorizontalGallery() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.3, delay: 0.12 }}
-              className="absolute bottom-5 left-0 right-0 flex justify-center"
+              className="absolute bottom-5 left-0 right-0 hidden sm:flex justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div
