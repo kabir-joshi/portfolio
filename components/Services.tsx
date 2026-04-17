@@ -121,6 +121,11 @@ export default function Services() {
               transition={{ duration: 0.7, delay: i * 0.12, ease: EASE }}
               className="h-full"
             >
+            <motion.div
+              whileHover={{ y: -8, boxShadow: "0 32px 80px rgba(255,255,255,0.05), 0 0 0 1px rgba(255,255,255,0.10)" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="h-full rounded-2xl"
+            >
             <TiltCard className="group relative flex flex-col h-full p-8 rounded-2xl border border-white/[0.06] light:border-black/[0.06] bg-white/[0.02] light:bg-black/[0.02] hover:bg-white/[0.04] light:hover:bg-black/[0.04] hover:border-white/[0.12] light:hover:border-black/[0.12] transition-all duration-300 cursor-default">
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xs font-mono text-white/20 light:text-black/20">{service.number}</span>
@@ -155,6 +160,7 @@ export default function Services() {
                 </span>
               </a>
             </TiltCard>
+            </motion.div>
             </motion.div>
           ))}
         </div>

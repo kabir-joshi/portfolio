@@ -102,6 +102,7 @@ export default function HorizontalGallery() {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const filmstripRef = useRef<HTMLDivElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const prevSelected = useRef<number | null>(null);
   const [shutterFlash, setShutterFlash] = useState(false);
@@ -129,6 +130,13 @@ export default function HorizontalGallery() {
       return () => clearTimeout(t);
     }
     prevSelected.current = selectedPhoto;
+  }, [selectedPhoto]);
+
+  // Scroll filmstrip to keep active thumbnail centered
+  useEffect(() => {
+    if (selectedPhoto === null || !filmstripRef.current) return;
+    const thumb = filmstripRef.current.children[selectedPhoto] as HTMLElement;
+    if (thumb) thumb.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [selectedPhoto]);
 
   useEffect(() => {
@@ -391,7 +399,7 @@ export default function HorizontalGallery() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.93, opacity: 0 }}
               transition={{ duration: 0.3, ease: EASE }}
-              className="relative max-w-[92vw] max-h-[88vh]"
+              className="relative max-w-[92vw] max-h-[74vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <Image
@@ -399,7 +407,7 @@ export default function HorizontalGallery() {
                 alt={photos[selectedPhoto].alt}
                 width={1800}
                 height={1400}
-                className="object-contain max-h-[88vh] w-auto rounded-lg"
+                className="object-contain max-h-[74vh] w-auto rounded-lg"
               />
               <div className="mt-3 flex items-center justify-center gap-6">
                 <p className="text-xs font-mono text-white/30 light:text-black/30 tracking-widest uppercase">
@@ -408,6 +416,40 @@ export default function HorizontalGallery() {
                 <span className="text-xs font-mono text-white/20 light:text-black/20 tabular-nums">
                   {String(selectedPhoto + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
                 </span>
+              </div>
+            </motion.div>
+
+            {/* Filmstrip */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.3, delay: 0.12 }}
+              className="absolute bottom-5 left-0 right-0 flex justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                ref={filmstripRef}
+                className="flex gap-1.5 overflow-x-auto px-6 py-1.5"
+                style={{ scrollbarWidth: "none" }}
+              >
+                {photos.map((p, i) => (
+                  <motion.button
+                    key={p.id}
+                    onClick={(e) => { e.stopPropagation(); setSelectedPhoto(i); }}
+                    whileHover={{ scale: 1.12 }}
+                    transition={{ duration: 0.15 }}
+                    className={`relative shrink-0 overflow-hidden rounded-md focus:outline-none transition-opacity duration-200 ${
+                      i === selectedPhoto
+                        ? "ring-1 ring-white/60 light:ring-black/60 opacity-100"
+                        : "opacity-30 hover:opacity-65"
+                    }`}
+                    style={{ width: 52, height: 38 }}
+                    aria-label={`View photo ${i + 1}`}
+                  >
+                    <Image src={p.src} alt={p.alt} fill className="object-cover" sizes="52px" />
+                  </motion.button>
+                ))}
               </div>
             </motion.div>
 

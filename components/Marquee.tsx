@@ -15,7 +15,7 @@ const items = [
 
 export default function Marquee() {
   return (
-    <div className="overflow-hidden border-y border-white/[0.04] light:border-black/[0.04] py-4 select-none">
+    <div className="overflow-hidden border-y border-white/[0.04] light:border-black/[0.04] py-4 select-none marquee-wrapper">
       <div className="flex whitespace-nowrap animate-marquee">
         {[0, 1].map((copy) => (
           <span key={copy} className="flex shrink-0 items-center">

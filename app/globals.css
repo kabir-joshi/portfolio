@@ -130,3 +130,9 @@ html.light .shimmer {
 .ambient-glow-b {
   animation: glow-drift-b 22s ease-in-out infinite;
 }
+
+/* ── Marquee pause on hover ────────────────────────────────────────── */
+.marquee-wrapper:hover .animate-marquee,
+.marquee-wrapper:hover .animate-marquee-reverse {
+  animation-play-state: paused;
+}

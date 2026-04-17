@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useInView, useScroll, useTransform, MotionValue } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { motion, useInView, useScroll, useTransform, MotionValue, useMotionValue, useSpring } from "framer-motion";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { EASE } from "@/lib/easing";
 
@@ -123,6 +123,22 @@ export default function About() {
     offset: ["start end", "end start"],
   });
 
+  const photoMX = useMotionValue(0);
+  const photoMY = useMotionValue(0);
+  const photoX = useSpring(photoMX, { stiffness: 65, damping: 20 });
+  const photoY = useSpring(photoMY, { stiffness: 65, damping: 20 });
+
+  const onPhotoMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    photoMX.set(((e.clientX - rect.left) / rect.width - 0.5) * 20);
+    photoMY.set(((e.clientY - rect.top) / rect.height - 0.5) * 14);
+  }, [photoMX, photoMY]);
+
+  const onPhotoMouseLeave = useCallback(() => {
+    photoMX.set(0);
+    photoMY.set(0);
+  }, [photoMX, photoMY]);
+
   return (
     <section id="about" ref={sectionRef} className="py-32 px-6">
       <div className="max-w-6xl mx-auto">
@@ -140,15 +156,24 @@ export default function About() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Photo with clip-path reveal */}
-          <div className="aspect-[3/4] rounded-2xl overflow-hidden relative">
-            <Image
-              src="/photos/finals-11.JPG"
-              alt="Athlete celebrates at the finish line"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
+          {/* Photo with clip-path reveal + mouse parallax */}
+          <div
+            className="aspect-[3/4] rounded-2xl overflow-hidden relative"
+            onMouseMove={onPhotoMouseMove}
+            onMouseLeave={onPhotoMouseLeave}
+          >
+            <motion.div
+              className="absolute inset-0"
+              style={{ x: photoX, y: photoY, scale: 1.08 }}
+            >
+              <Image
+                src="/photos/finals-11.JPG"
+                alt="Athlete celebrates at the finish line"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </motion.div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             {/* Wipe reveal overlay */}
             <motion.div
