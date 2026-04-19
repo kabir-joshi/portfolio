@@ -2,6 +2,12 @@
 
 import { useEffect, useState, useCallback } from "react";
 
+interface Analytics {
+  totals: { today: string; week: string; month: string; all_time: string };
+  topPages: { path: string; views: string }[];
+  recent: { path: string; referrer: string; ua: string; ip: string; created_at: string }[];
+}
+
 interface Review {
   id: string;
   name: string;
@@ -470,6 +476,7 @@ export default function AdminPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const [newTitle, setNewTitle] = useState("");
@@ -479,10 +486,11 @@ export default function AdminPage() {
   const [adding, setAdding] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const [rv, gv, iq] = await Promise.all([
+    const [rv, gv, iq, an] = await Promise.all([
       fetch("/api/reviews").then((r) => r.json()),
       fetch("/api/galleries").then((r) => r.json()),
       fetch("/api/contact").then((r) => r.json()),
+      fetch("/api/analytics").then((r) => r.json()),
     ]);
     setReviews(rv);
     const withPins = await fetch("/api/admin/galleries")
@@ -490,6 +498,7 @@ export default function AdminPage() {
       .catch(() => gv);
     setGalleries(withPins);
     setInquiries(iq);
+    if (!an.error) setAnalytics(an);
   }, []);
 
   useEffect(() => {
@@ -629,6 +638,69 @@ export default function AdminPage() {
             Sign out
           </button>
         </div>
+
+        {/* ── Traffic ────────────────────────────────────────────────────── */}
+        {analytics && (
+          <section>
+            <h2 className="text-lg font-semibold mb-6">Traffic</h2>
+
+            {/* Overview stats */}
+            <div className="grid grid-cols-4 gap-3 mb-8">
+              {[
+                { label: "Today", value: analytics.totals.today },
+                { label: "7 days", value: analytics.totals.week },
+                { label: "30 days", value: analytics.totals.month },
+                { label: "All time", value: analytics.totals.all_time },
+              ].map(({ label, value }) => (
+                <div key={label} className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <div className="text-2xl font-bold font-mono text-white tabular-nums">{Number(value).toLocaleString()}</div>
+                  <div className="text-[10px] font-mono text-white/30 mt-1 uppercase tracking-widest">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Top pages */}
+              <div>
+                <h3 className="text-xs font-mono text-white/30 uppercase tracking-widest mb-3">Top pages (30d)</h3>
+                <div className="space-y-1.5">
+                  {analytics.topPages.length === 0 && (
+                    <p className="text-white/20 text-sm font-mono">No data yet.</p>
+                  )}
+                  {analytics.topPages.map((p) => (
+                    <div key={p.path} className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                      <span className="text-xs font-mono text-white/60 truncate">{p.path || "/"}</span>
+                      <span className="text-xs font-mono text-white/30 ml-4 shrink-0">{Number(p.views).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent views */}
+              <div>
+                <h3 className="text-xs font-mono text-white/30 uppercase tracking-widest mb-3">Recent visitors</h3>
+                <div className="space-y-1.5">
+                  {analytics.recent.length === 0 && (
+                    <p className="text-white/20 text-sm font-mono">No data yet.</p>
+                  )}
+                  {analytics.recent.map((v, i) => (
+                    <div key={i} className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono text-white/60">{v.path || "/"}</span>
+                        <span className="text-[10px] font-mono text-white/20 ml-4 shrink-0">
+                          {new Date(v.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                      {v.referrer && (
+                        <p className="text-[10px] font-mono text-white/20 truncate mt-0.5">from {v.referrer}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── Bookings ───────────────────────────────────────────────────── */}
         <section>

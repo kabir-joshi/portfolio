@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Intro from "@/components/Intro";
+import { after } from "next/server";
+import { headers } from "next/headers";
+import { neon } from "@neondatabase/serverless";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,11 +47,41 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = (await headers()).get("x-pathname") ?? "/";
+
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/api")) {
+    after(async () => {
+      try {
+        const sql = neon(process.env.DATABASE_URL!);
+        await sql`
+          CREATE TABLE IF NOT EXISTS page_views (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            path VARCHAR(500) NOT NULL,
+            referrer VARCHAR(1000),
+            ua VARCHAR(500),
+            ip VARCHAR(100),
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+          )
+        `;
+        const hdrs = await headers();
+        await sql`
+          INSERT INTO page_views (path, referrer, ua, ip)
+          VALUES (
+            ${pathname},
+            ${hdrs.get("referer") ?? ""},
+            ${hdrs.get("user-agent") ?? ""},
+            ${(hdrs.get("x-forwarded-for") ?? "").split(",")[0].trim()}
+          )
+        `;
+      } catch {}
+    });
+  }
+
   return (
     <html
       lang="en"
