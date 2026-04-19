@@ -13,17 +13,12 @@ interface Announcement {
   cta_link?: string;
 }
 
-const STORAGE_KEY = "event_popup_dismissed";
-const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000;
 
 export default function EventPopup() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (dismissed && Date.now() - Number(dismissed) < DISMISS_DURATION_MS) return;
-
     fetch("/api/announcement")
       .then((r) => r.json())
       .then((data) => {
@@ -37,7 +32,6 @@ export default function EventPopup() {
 
   const dismiss = () => {
     setVisible(false);
-    localStorage.setItem(STORAGE_KEY, String(Date.now()));
   };
 
   return (
