@@ -2,6 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 
+interface Announcement {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  event_date: string | null;
+  location: string | null;
+  cta_text: string | null;
+  cta_link: string | null;
+  active: boolean;
+  created_at: string;
+}
+
 interface Analytics {
   totals: { today: string; week: string; month: string; all_time: string };
   topPages: { path: string; views: string }[];
@@ -477,6 +489,9 @@ export default function AdminPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [annForm, setAnnForm] = useState({ title: "", subtitle: "", event_date: "", location: "", cta_text: "", cta_link: "" });
+  const [annSaving, setAnnSaving] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const [newTitle, setNewTitle] = useState("");
@@ -486,11 +501,12 @@ export default function AdminPage() {
   const [adding, setAdding] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const [rv, gv, iq, an] = await Promise.all([
+    const [rv, gv, iq, an, ann] = await Promise.all([
       fetch("/api/reviews").then((r) => r.json()),
       fetch("/api/galleries").then((r) => r.json()),
       fetch("/api/contact").then((r) => r.json()),
       fetch("/api/analytics").then((r) => r.json()),
+      fetch("/api/admin/announcement").then((r) => r.json()),
     ]);
     setReviews(rv);
     const withPins = await fetch("/api/admin/galleries")
@@ -499,6 +515,7 @@ export default function AdminPage() {
     setGalleries(withPins);
     setInquiries(iq);
     if (!an.error) setAnalytics(an);
+    if (Array.isArray(ann)) setAnnouncements(ann);
   }, []);
 
   useEffect(() => {
@@ -579,6 +596,42 @@ export default function AdminPage() {
 
   const updateInquiry = (id: string, updated: Partial<Inquiry>) => {
     setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, ...updated } : i)));
+  };
+
+  const saveAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAnnSaving(true);
+    const res = await fetch("/api/admin/announcement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(annForm),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setAnnouncements((prev) => [created, ...prev.map((a) => ({ ...a, active: false }))]);
+      setAnnForm({ title: "", subtitle: "", event_date: "", location: "", cta_text: "", cta_link: "" });
+    }
+    setAnnSaving(false);
+  };
+
+  const toggleAnnouncement = async (id: string, active: boolean) => {
+    await fetch("/api/admin/announcement", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, active }),
+    });
+    setAnnouncements((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, active } : active ? { ...a, active: false } : a))
+    );
+  };
+
+  const deleteAnnouncement = async (id: string) => {
+    await fetch("/api/admin/announcement", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
   };
 
   // Derived counts
@@ -701,6 +754,115 @@ export default function AdminPage() {
             </div>
           </section>
         )}
+
+        {/* ── Event Announcements ────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold">Event Announcements</h2>
+            {announcements.some((a) => a.active) && (
+              <span className="text-[11px] font-mono text-emerald-400/70 bg-emerald-400/[0.08] border border-emerald-400/20 px-2 py-0.5 rounded-full">
+                Live
+              </span>
+            )}
+          </div>
+
+          {/* Create form */}
+          <form onSubmit={saveAnnouncement} className="space-y-3 mb-8 p-5 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+            <p className="text-xs font-mono text-white/25 uppercase tracking-widest mb-4">New announcement</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <input
+                value={annForm.title}
+                onChange={(e) => setAnnForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder="Event title *"
+                required
+                className={inputClass}
+              />
+              <input
+                value={annForm.event_date}
+                onChange={(e) => setAnnForm((f) => ({ ...f, event_date: e.target.value }))}
+                placeholder="Date (e.g. May 3, 2025)"
+                className={inputClass}
+              />
+              <input
+                value={annForm.location}
+                onChange={(e) => setAnnForm((f) => ({ ...f, location: e.target.value }))}
+                placeholder="Location"
+                className={inputClass}
+              />
+              <input
+                value={annForm.subtitle}
+                onChange={(e) => setAnnForm((f) => ({ ...f, subtitle: e.target.value }))}
+                placeholder="Short description"
+                className={inputClass}
+              />
+              <input
+                value={annForm.cta_text}
+                onChange={(e) => setAnnForm((f) => ({ ...f, cta_text: e.target.value }))}
+                placeholder="Button label (e.g. Book now)"
+                className={inputClass}
+              />
+              <input
+                value={annForm.cta_link}
+                onChange={(e) => setAnnForm((f) => ({ ...f, cta_link: e.target.value }))}
+                placeholder="Button URL (optional)"
+                className={inputClass}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={annSaving}
+              className="w-full py-2.5 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors disabled:opacity-40"
+            >
+              {annSaving ? "Saving..." : "Publish announcement"}
+            </button>
+          </form>
+
+          {/* Existing announcements */}
+          <div className="space-y-3">
+            {announcements.length === 0 && (
+              <p className="text-white/20 text-sm font-mono">No announcements yet.</p>
+            )}
+            {announcements.map((ann) => (
+              <div key={ann.id} className="flex items-start justify-between p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-sm font-semibold text-white">{ann.title}</span>
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                      ann.active
+                        ? "text-emerald-400/90 bg-emerald-400/[0.08] border-emerald-400/25"
+                        : "text-white/30 bg-white/[0.03] border-white/[0.08]"
+                    }`}>
+                      {ann.active ? "Live" : "Off"}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs font-mono text-white/30">
+                    {ann.event_date && <span>{ann.event_date}</span>}
+                    {ann.location && <span>{ann.location}</span>}
+                    {ann.subtitle && <span className="text-white/20 truncate max-w-xs">{ann.subtitle}</span>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button
+                    onClick={() => toggleAnnouncement(ann.id, !ann.active)}
+                    className={`text-[11px] font-mono transition-colors ${
+                      ann.active
+                        ? "text-white/30 hover:text-white/60"
+                        : "text-emerald-400/50 hover:text-emerald-400/80"
+                    }`}
+                  >
+                    {ann.active ? "Turn off" : "Go live"}
+                  </button>
+                  <button
+                    onClick={() => deleteAnnouncement(ann.id)}
+                    className="text-[11px] font-mono text-red-400/40 hover:text-red-400/80 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* ── Bookings ───────────────────────────────────────────────────── */}
         <section>
