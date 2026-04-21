@@ -85,6 +85,34 @@ const photos = [
     src: "/photos/DSC09368.jpg",
     alt: "Kenwood relay team baton exchange",
   },
+  {
+    id: 12,
+    category: "Track & Field",
+    aspect: "aspect-[3/4]",
+    src: "/photos/DSC09365.png",
+    alt: "Class 2A sprinter rounds the bend with baton",
+  },
+  {
+    id: 13,
+    category: "Track & Field",
+    aspect: "aspect-[3/2]",
+    src: "/photos/DSC08887.png",
+    alt: "Lincoln sprinter celebrates at the finish line",
+  },
+  {
+    id: 14,
+    category: "Cross Country",
+    aspect: "aspect-[3/2]",
+    src: "/photos/DSC03116.png",
+    alt: "Du Quoin runner leads the state cross country field",
+  },
+  {
+    id: 15,
+    category: "Track & Field",
+    aspect: "aspect-[4/3]",
+    src: "/photos/DSC00136.png",
+    alt: "High jumper clears the bar",
+  },
 ];
 
 function PhotoCard({
