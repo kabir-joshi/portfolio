@@ -71,6 +71,20 @@ const photos = [
     src: "/photos/IMG_3786.JPG",
     alt: "Elite marathon runner",
   },
+  {
+    id: 10,
+    category: "Track & Field",
+    aspect: "aspect-[3/4]",
+    src: "/photos/DSC09137.png",
+    alt: "Long jumper soaring through the air",
+  },
+  {
+    id: 11,
+    category: "Track & Field",
+    aspect: "aspect-[4/3]",
+    src: "/photos/DSC09368.jpg",
+    alt: "Kenwood relay team baton exchange",
+  },
 ];
 
 function PhotoCard({
