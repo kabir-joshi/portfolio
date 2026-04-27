@@ -14,6 +14,9 @@ interface Gallery {
 }
 
 function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: () => void }) {
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [followedInstagram, setFollowedInstagram] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -33,34 +36,76 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
         <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">Before you continue</span>
         <h2 className="text-2xl font-bold tracking-tight text-white mt-3 mb-6">A quick note</h2>
 
-        <div className="space-y-4 text-sm text-white/55 leading-relaxed">
-          <p>
-            These photos were made for you, and I put real care into every one of them. If you share any of my work online, please tag{" "}
-            <span className="text-white font-medium">@kabirjphoto</span> so others can find me.
-          </p>
-          <p>
-            Not tagging puts your future sessions at risk. Anyone who repeatedly shares untagged work may be declined from future photos altogether, paid or free.
-          </p>
-          <p className="text-white/35">
-            And if you&apos;re not already following me, it would mean the world.{" "}
-            <a
-              href="https://www.instagram.com/kabirjphoto/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/60 underline underline-offset-2 hover:text-white transition-colors"
+        <p className="text-sm text-white/55 leading-relaxed mb-6">
+          These photos were made for you, and I put real care into every one of them. Please read the below before accessing your gallery.
+        </p>
+
+        <div className="space-y-3 mb-8">
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div
+              onClick={() => setAgreedToTerms(!agreedToTerms)}
+              className={`mt-0.5 w-5 h-5 shrink-0 rounded-md border transition-all duration-200 flex items-center justify-center ${
+                agreedToTerms
+                  ? "bg-white border-white"
+                  : "border-white/20 bg-white/[0.03] group-hover:border-white/40"
+              }`}
             >
-              @kabirjphoto on Instagram
-            </a>
-            . It helps more than you know.
-          </p>
+              {agreedToTerms && (
+                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span
+              onClick={() => setAgreedToTerms(!agreedToTerms)}
+              className="text-sm text-white/50 leading-relaxed select-none group-hover:text-white/70 transition-colors"
+            >
+              I agree to tag{" "}
+              <span className="text-white/80 font-medium">@kabirjphoto</span> whenever I post these photos. I understand that failing to do so may result in being declined for future photos, paid or free.
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div
+              onClick={() => setFollowedInstagram(!followedInstagram)}
+              className={`mt-0.5 w-5 h-5 shrink-0 rounded-md border transition-all duration-200 flex items-center justify-center ${
+                followedInstagram
+                  ? "bg-white border-white"
+                  : "border-white/20 bg-white/[0.03] group-hover:border-white/40"
+              }`}
+            >
+              {followedInstagram && (
+                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span
+              onClick={() => setFollowedInstagram(!followedInstagram)}
+              className="text-sm text-white/50 leading-relaxed select-none group-hover:text-white/70 transition-colors"
+            >
+              I&apos;m following{" "}
+              <a
+                href="https://www.instagram.com/kabirjphoto/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 underline underline-offset-2 hover:text-white transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                @kabirjphoto on Instagram
+              </a>
+              . It means the world and helps more than you know.
+            </span>
+          </label>
         </div>
 
-        <div className="flex flex-col gap-2 mt-8">
+        <div className="flex flex-col gap-2">
           <button
             onClick={onAccept}
-            className="w-full py-3 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
+            disabled={!agreedToTerms}
+            className="w-full py-3 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            I understand, view my gallery
+            View my gallery
           </button>
           <button
             onClick={onDecline}
