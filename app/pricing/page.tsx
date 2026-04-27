@@ -10,8 +10,8 @@ const packages = [
   {
     name: "Event Coverage",
     tiers: [
-      { label: "Half Day", duration: "Up to 4 hours", price: "$150" },
-      { label: "Full Day", duration: "Up to 8 hours", price: "$275" },
+      { label: "Half Day", duration: "Up to 4 hours", price: "$150–$200" },
+      { label: "Full Day", duration: "Up to 8 hours", price: "$300–$400" },
     ],
     includes: [
       "50–150 edited photos",
@@ -24,8 +24,8 @@ const packages = [
   {
     name: "Portrait Session",
     tiers: [
-      { label: "Individual", duration: "1 hour", price: "$75" },
-      { label: "Team", duration: "Up to 2 hours, 2–10 athletes", price: "$150" },
+      { label: "Individual", duration: "1 hour", price: "$75–$125" },
+      { label: "Team", duration: "Up to 2 hours, 2–10 athletes", price: "$150–$225" },
     ],
     includes: [
       "20–40 edited photos",
