@@ -16,13 +16,28 @@ interface Gallery {
 function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: () => void }) {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [followedInstagram, setFollowedInstagram] = useState(false);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewBody, setReviewBody] = useState("");
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  const handleAccept = async () => {
+    if (reviewName.trim() && reviewRating > 0 && reviewBody.trim() && !reviewSubmitted) {
+      await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: reviewName.trim(), rating: reviewRating, body: reviewBody.trim() }),
+      });
+    }
+    onAccept();
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
       onClick={onDecline}
     >
       <motion.div
@@ -30,7 +45,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.97 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="relative w-full max-w-md bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-8"
+        className="relative w-full max-w-md bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-8 my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">Before you continue</span>
@@ -40,7 +55,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
           These photos were made for you, and I put real care into every one of them. Please read the below before accessing your gallery.
         </p>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-6">
           <label className="flex items-start gap-3 cursor-pointer group">
             <div
               onClick={() => setAgreedToTerms(!agreedToTerms)}
@@ -99,13 +114,46 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
           </label>
         </div>
 
+        {/* Review section */}
+        <div className="border-t border-white/[0.06] pt-6 mb-6">
+          <p className="text-xs font-mono text-white/25 uppercase tracking-[0.2em] mb-4">Leave a review <span className="normal-case tracking-normal">(optional)</span></p>
+          <div className="space-y-3">
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setReviewRating(star)}
+                  className={`text-xl leading-none transition-colors ${star <= reviewRating ? "text-white" : "text-white/15 hover:text-white/40"}`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={reviewName}
+              onChange={(e) => setReviewName(e.target.value)}
+              placeholder="Your name"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors"
+            />
+            <textarea
+              value={reviewBody}
+              onChange={(e) => setReviewBody(e.target.value)}
+              placeholder="How was your experience?"
+              rows={3}
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-white/80 text-sm placeholder-white/20 focus:outline-none focus:border-white/30 transition-colors resize-none"
+            />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2">
           <button
-            onClick={onAccept}
+            onClick={handleAccept}
             disabled={!agreedToTerms}
             className="w-full py-3 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            View my gallery
+            {reviewName.trim() && reviewRating > 0 && reviewBody.trim() ? "Submit review & view gallery" : "View my gallery"}
           </button>
           <button
             onClick={onDecline}
