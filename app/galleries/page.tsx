@@ -39,7 +39,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
             <span className="text-white font-medium">@kabirjphoto</span> so others can find me.
           </p>
           <p>
-            Not tagging puts your future sessions at risk. Clients who repeatedly share untagged work may be declined for future bookings.
+            Not tagging puts your future sessions at risk. Clients who repeatedly share untagged work may be declined from future photos altogether — paid or free.
           </p>
           <p className="text-white/35">
             And if you&apos;re not already following me —{" "}
