@@ -139,6 +139,7 @@ function GalleryCard({ gallery, index }: { gallery: Gallery; index: number }) {
 
   const handleTermsAccept = () => {
     if (pendingUrl) window.open(pendingUrl, "_blank", "noopener,noreferrer");
+    fetch(`/api/galleries/${gallery.id}`, { method: "PUT" });
     setShowTerms(false);
     setPendingUrl(null);
     setShowPasswordForm(false);

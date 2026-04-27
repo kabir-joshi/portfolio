@@ -66,6 +66,15 @@ export async function PATCH(
   return Response.json({ ok: true });
 }
 
+export async function PUT(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  await sql`UPDATE galleries SET view_count = view_count + 1 WHERE id = ${id}`;
+  return new Response(null, { status: 204 });
+}
+
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }

@@ -48,6 +48,7 @@ interface Gallery {
   pin: string | null;
   gallery_password: string | null;
   created_at: string;
+  view_count: number;
 }
 
 const inputClass =
@@ -360,6 +361,9 @@ function GalleryRow({
         {gallery.gallery_password && <p className="text-xs font-mono text-white/40 mt-0.5">Access password: {gallery.gallery_password}</p>}
         <p className="text-xs font-mono text-white/25 mt-0.5">
           {new Date(gallery.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+        </p>
+        <p className="text-xs font-mono text-white/30 mt-0.5">
+          {gallery.view_count ?? 0} {(gallery.view_count ?? 0) === 1 ? "open" : "opens"}
         </p>
       </div>
       <div className="flex items-center gap-4 ml-4 shrink-0">

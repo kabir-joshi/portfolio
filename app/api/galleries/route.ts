@@ -15,6 +15,7 @@ async function ensureTable() {
     )
   `;
   await sql`ALTER TABLE galleries ADD COLUMN IF NOT EXISTS gallery_password VARCHAR(100)`;
+  await sql`ALTER TABLE galleries ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0`;
 }
 
 async function isAdmin() {
