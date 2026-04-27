@@ -110,6 +110,7 @@ export default function Reviews() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [showAll, setShowAll] = useState(false);
   const [name, setName] = useState("");
   const [event, setEvent] = useState("");
   const [rating, setRating] = useState(0);
@@ -182,9 +183,20 @@ export default function Reviews() {
               </motion.p>
             ) : (
               <div className="space-y-4">
-                {reviews.map((review, i) => (
+                {(showAll ? reviews : reviews.slice(0, 3)).map((review, i) => (
                   <ReviewCard key={review.id} review={review} index={i} inView={inView} />
                 ))}
+                {reviews.length > 3 && (
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={inView ? { opacity: 1 } : {}}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    onClick={() => setShowAll((v) => !v)}
+                    className="text-xs font-mono text-white/30 light:text-black/30 hover:text-white/60 light:hover:text-black/60 transition-colors duration-200 tracking-widest uppercase"
+                  >
+                    {showAll ? "Show less" : `View All Reviews (${reviews.length})`}
+                  </motion.button>
+                )}
               </div>
             )}
           </div>
