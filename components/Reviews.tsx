@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { EASE } from "@/lib/easing";
 
 function SplitText({ text, inView, baseDelay = 0.1 }: { text: string; inView: boolean; baseDelay?: number }) {
@@ -110,7 +111,6 @@ export default function Reviews() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [showAll, setShowAll] = useState(false);
   const [name, setName] = useState("");
   const [event, setEvent] = useState("");
   const [rating, setRating] = useState(0);
@@ -183,19 +183,22 @@ export default function Reviews() {
               </motion.p>
             ) : (
               <div className="space-y-4">
-                {(showAll ? reviews : reviews.slice(0, 3)).map((review, i) => (
+                {reviews.slice(0, 3).map((review, i) => (
                   <ReviewCard key={review.id} review={review} index={i} inView={inView} />
                 ))}
                 {reviews.length > 3 && (
-                  <motion.button
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={inView ? { opacity: 1 } : {}}
                     transition={{ duration: 0.6, delay: 0.4 }}
-                    onClick={() => setShowAll((v) => !v)}
-                    className="text-xs font-mono text-white/30 light:text-black/30 hover:text-white/60 light:hover:text-black/60 transition-colors duration-200 tracking-widest uppercase"
                   >
-                    {showAll ? "Show less" : `View All Reviews (${reviews.length})`}
-                  </motion.button>
+                    <Link
+                      href="/reviews"
+                      className="text-xs font-mono text-white/30 light:text-black/30 hover:text-white/60 light:hover:text-black/60 transition-colors duration-200 tracking-widest uppercase"
+                    >
+                      View All Reviews ({reviews.length})
+                    </Link>
+                  </motion.div>
                 )}
               </div>
             )}
