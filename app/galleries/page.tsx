@@ -35,14 +35,14 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
 
         <div className="space-y-4 text-sm text-white/55 leading-relaxed">
           <p>
-            These photos were made for you — and I put real care into every one of them. If you share any of my work online, please tag{" "}
+            These photos were made for you, and I put real care into every one of them. If you share any of my work online, please tag{" "}
             <span className="text-white font-medium">@kabirjphoto</span> so others can find me.
           </p>
           <p>
-            Not tagging puts your future sessions at risk. Anyone who repeatedly shares untagged work may be declined from future photos altogether — paid or free.
+            Not tagging puts your future sessions at risk. Anyone who repeatedly shares untagged work may be declined from future photos altogether, paid or free.
           </p>
           <p className="text-white/35">
-            And if you&apos;re not already following me —{" "}
+            And if you&apos;re not already following me, it would mean the world.{" "}
             <a
               href="https://www.instagram.com/kabirjphoto/"
               target="_blank"
@@ -50,8 +50,8 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
               className="text-white/60 underline underline-offset-2 hover:text-white transition-colors"
             >
               @kabirjphoto on Instagram
-            </a>{" "}
-            would mean the world. It helps more than you know.
+            </a>
+            . It helps more than you know.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
             onClick={onAccept}
             className="w-full py-3 rounded-xl bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
           >
-            I understand — view my gallery
+            I understand, view my gallery
           </button>
           <button
             onClick={onDecline}
