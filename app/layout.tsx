@@ -6,7 +6,6 @@ import Intro from "@/components/Intro";
 import { after } from "next/server";
 import { headers } from "next/headers";
 import { neon } from "@neondatabase/serverless";
-import EventPopup from "@/components/EventPopup";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -106,7 +105,6 @@ export default async function RootLayout({
         {children}
 
         </SmoothScroll>
-        <EventPopup />
         {/* Film grain overlay */}
         <div
           aria-hidden

@@ -19,12 +19,18 @@ export default function EventPopup() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const key = "event_popup_last_shown";
+    const last = localStorage.getItem(key);
+    const today = new Date().toDateString();
+    if (last === today) return;
+
     fetch("/api/announcement")
       .then((r) => r.json())
       .then((data) => {
         if (data?.id) {
           setAnnouncement(data);
           setTimeout(() => setVisible(true), 1200);
+          localStorage.setItem(key, today);
         }
       })
       .catch(() => {});

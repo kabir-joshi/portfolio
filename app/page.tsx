@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import EventPopup from "@/components/EventPopup";
 import Hero from "@/components/Hero";
 import HorizontalGallery from "@/components/HorizontalGallery";
 import Marquee from "@/components/Marquee";
@@ -13,6 +14,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 export default function Home() {
   return (
     <>
+      <EventPopup />
       <main className="bg-black light:bg-[#f5f0eb]">
         <Navbar />
         <Hero />
