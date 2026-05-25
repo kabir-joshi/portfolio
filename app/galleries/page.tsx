@@ -55,6 +55,24 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
           These photos were made for you, and I put real care into every one of them. Please read the below before accessing your gallery.
         </p>
 
+        {/* Tip callout */}
+        <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-5 py-4 mb-6">
+          <p className="text-xs font-mono text-white/25 uppercase tracking-[0.25em] mb-2">Photography is free</p>
+          <p className="text-sm text-white/50 leading-relaxed">
+            I shoot and edit everything at no charge. If you enjoyed your photos and want to show some love, tips are always appreciated — but never expected.
+          </p>
+          <div className="mt-4 flex items-center gap-4">
+            <img
+              src="/zelle-qr.jpeg"
+              alt="Zelle QR code"
+              className="w-20 h-20 rounded-lg object-cover shrink-0"
+            />
+            <p className="text-xs text-white/35 leading-relaxed">
+              Scan with your bank app to send a tip via Zelle.
+            </p>
+          </div>
+        </div>
+
         <div className="space-y-3 mb-6">
           <label className="flex items-start gap-3 cursor-pointer group">
             <div
