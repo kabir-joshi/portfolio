@@ -52,10 +52,6 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
         <span className="text-xs font-mono text-white/25 tracking-[0.3em] uppercase">Before you continue</span>
         <h2 className="text-2xl font-bold tracking-tight text-white mt-3 mb-6">A quick note</h2>
 
-        <p className="text-sm text-white/55 leading-relaxed mb-6">
-          These photos were made for you, and I put real care into every one of them. Please read the below before accessing your gallery.
-        </p>
-
         {/* Tip callout */}
         <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-5 py-4 mb-6">
           <p className="text-xs font-mono text-white/25 uppercase tracking-[0.25em] mb-2">Photography is free</p>
