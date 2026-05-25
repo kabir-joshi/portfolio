@@ -81,11 +81,11 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: EASE }}
-                className="bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-6 flex flex-col items-center gap-4"
+                className="bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-8 flex flex-col items-center gap-5"
                 onClick={(e) => e.stopPropagation()}
               >
                 <p className="text-xs font-mono text-white/25 uppercase tracking-[0.25em]">Tip via Zelle</p>
-                <img src="/zelle-qr.jpeg" alt="Zelle QR code" className="w-56 h-56 rounded-xl object-cover" />
+                <img src="/zelle-qr.jpeg" alt="Zelle QR code" className="w-80 h-80 rounded-xl object-cover" />
                 <p className="text-xs text-white/35 text-center">Scan with your bank app</p>
                 <button
                   onClick={() => setShowZelle(false)}
