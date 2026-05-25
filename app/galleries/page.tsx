@@ -20,6 +20,7 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewBody, setReviewBody] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [showZelle, setShowZelle] = useState(false);
 
   const handleAccept = async () => {
     if (reviewName.trim() && reviewRating > 0 && reviewBody.trim() && !reviewSubmitted) {
@@ -59,19 +60,47 @@ function TermsModal({ onAccept, onDecline }: { onAccept: () => void; onDecline: 
         <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-5 py-4 mb-6">
           <p className="text-xs font-mono text-white/25 uppercase tracking-[0.25em] mb-2">Photography is free</p>
           <p className="text-sm text-white/50 leading-relaxed">
-            I shoot and edit everything at no charge. If you enjoyed your photos and want to show some love, tips are always appreciated — but never expected.
+            I shoot and edit most events at no charge. If you enjoyed your photos and want to show some love, tips are always appreciated but never expected.{" "}
+            <button
+              onClick={() => setShowZelle(true)}
+              className="text-sky-400 hover:text-sky-300 transition-colors underline underline-offset-2"
+            >
+              Tip Here
+            </button>
           </p>
-          <div className="mt-4 flex items-center gap-4">
-            <img
-              src="/zelle-qr.jpeg"
-              alt="Zelle QR code"
-              className="w-20 h-20 rounded-lg object-cover shrink-0"
-            />
-            <p className="text-xs text-white/35 leading-relaxed">
-              Scan with your bank app to send a tip via Zelle.
-            </p>
-          </div>
         </div>
+
+        {/* Zelle overlay */}
+        <AnimatePresence>
+          {showZelle && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+              onClick={() => setShowZelle(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2, ease: EASE }}
+                className="bg-[#0a0a0a] border border-white/[0.08] rounded-2xl p-6 flex flex-col items-center gap-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="text-xs font-mono text-white/25 uppercase tracking-[0.25em]">Tip via Zelle</p>
+                <img src="/zelle-qr.jpeg" alt="Zelle QR code" className="w-56 h-56 rounded-xl object-cover" />
+                <p className="text-xs text-white/35 text-center">Scan with your bank app</p>
+                <button
+                  onClick={() => setShowZelle(false)}
+                  className="text-xs font-mono text-white/25 hover:text-white/50 transition-colors"
+                >
+                  Close
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="space-y-3 mb-6">
           <label className="flex items-start gap-3 cursor-pointer group">
